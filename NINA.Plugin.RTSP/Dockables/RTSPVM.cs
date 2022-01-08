@@ -89,7 +89,7 @@ namespace NINA.Plugin.RTSP.Dockables {
         public string Username {
             get => pluginSettings.GetValueString(nameof(Username), "");
             set {
-                pluginSettings.SetValueString(nameof(Username), System.Web.HttpUtility.UrlEncode(value));
+                pluginSettings.SetValueString(nameof(Username), value);
                 RaisePropertyChanged();
             }
         }
@@ -97,7 +97,7 @@ namespace NINA.Plugin.RTSP.Dockables {
         public string Password {
             get => password;
             set {
-                password = System.Web.HttpUtility.UrlEncode(value);
+                password = value;
 
                 if (!string.IsNullOrWhiteSpace(value)) {
                     var encrypt = DataProtection.Protect(value);
@@ -136,7 +136,7 @@ namespace NINA.Plugin.RTSP.Dockables {
                             if (string.IsNullOrWhiteSpace(Password)) {
                                 throw new Exception("Password must not be empty");
                             }
-                            uri = new Uri($"{Protocol}{Username}:{Password}@{MediaUrl}");
+                            uri = new Uri($"{Protocol}{System.Web.HttpUtility.UrlEncode(Username)}:{System.Web.HttpUtility.UrlEncode(Password)}@{MediaUrl}");
                         }
 
                         var successfullyOpened = await media.Open(uri);
