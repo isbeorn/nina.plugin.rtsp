@@ -21,10 +21,25 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+            <StackPanel
+                x:Name="LoadingControl"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Orientation="Vertical"
+                Visibility="{Binding IsOpening, ElementName=Media, Converter={StaticResource BooleanToVisibilityCollapsedConverter}}">
+                <ninactrl:LoadingControl
+                    Width="50"
+                    Height="50"
+                    LoadingImageBrush="{StaticResource PrimaryBrush}" />
+                <TextBlock HorizontalAlignment="Center" Text="Loading media" />
+            </StackPanel>
+
             <ffme:MediaElement
-                x:Name="Media" MediaInitializing="Media_MediaInitializing" MediaFailed="Media_MediaFailed"
+                x:Name="Media"
                 Background="Transparent"
                 LoadedBehavior="Play"
+                MediaFailed="Media_MediaFailed"
+                MediaInitializing="Media_MediaInitializing"
                 UnloadedBehavior="Stop" />
             <Expander
                 Grid.Row="1"
@@ -32,7 +47,7 @@
                 Header="Credentials"
                 IsExpanded="{Binding OptionsExpanded}">
                 <WrapPanel Orientation="Horizontal">
-                    <TextBlock VerticalAlignment="Center" Text="rtsp://" />
+                    <ComboBox ItemsSource="{Binding Protocols}" SelectedItem="{Binding Protocol}" />
                     <ninactrl:HintTextBox
                         MinWidth="80"
                         Margin="5,0,0,0"

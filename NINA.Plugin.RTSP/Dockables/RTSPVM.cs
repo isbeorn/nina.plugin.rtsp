@@ -5,6 +5,7 @@ using NINA.Profile;
 using NINA.Profile.Interfaces;
 using NINA.WPF.Base.ViewModel;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -30,13 +31,12 @@ namespace NINA.Plugin.RTSP.Dockables {
 
             var assembly = this.GetType().Assembly;
             var id = assembly.GetCustomAttribute<GuidAttribute>().Value;
-            this.pluginSettings = new PluginOptionsAccessor(profileService, Guid.Parse(id));           
+            this.pluginSettings = new PluginOptionsAccessor(profileService, Guid.Parse(id));
             var encrypt = pluginSettings.GetValueString(nameof(Password), "");
             try {
-
                 var pw = DataProtection.Unprotect(Convert.FromBase64String(encrypt));
                 Password = pw;
-            } catch(Exception) {
+            } catch (Exception) {
                 Password = "";
             }
 
@@ -55,6 +55,20 @@ namespace NINA.Plugin.RTSP.Dockables {
             get => optionsExpanded;
             set {
                 optionsExpanded = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public List<string> Protocols => new List<string>() {
+            "rtsp://",
+            "http://",
+            "https://"
+        };
+
+        public string Protocol {
+            get => pluginSettings.GetValueString(nameof(Protocol), "rtsp://");
+            set {
+                pluginSettings.SetValueString(nameof(Protocol), value);
                 RaisePropertyChanged();
             }
         }
@@ -80,13 +94,13 @@ namespace NINA.Plugin.RTSP.Dockables {
             set {
                 password = value;
 
-                if(!string.IsNullOrWhiteSpace(value)) {
+                if (!string.IsNullOrWhiteSpace(value)) {
                     var encrypt = DataProtection.Protect(value);
                     pluginSettings.SetValueString(nameof(Password), Convert.ToBase64String(encrypt));
                 } else {
                     pluginSettings.SetValueString(nameof(Password), "");
-                }  
-                
+                }
+
                 RaisePropertyChanged();
             }
         }
@@ -95,7 +109,7 @@ namespace NINA.Plugin.RTSP.Dockables {
             Password = SecureStringToString(s);
         }
 
-        string SecureStringToString(SecureString value) {
+        private string SecureStringToString(SecureString value) {
             IntPtr valuePtr = IntPtr.Zero;
             try {
                 valuePtr = Marshal.SecureStringToGlobalAllocUnicode(value);
@@ -111,32 +125,30 @@ namespace NINA.Plugin.RTSP.Dockables {
                     try {
                         var media = o as MediaElement;
                         Uri uri;
-                        if(string.IsNullOrEmpty(Username)) {
-                            uri = new Uri($"rtsp://{MediaUrl}");
+                        if (string.IsNullOrEmpty(Username)) {
+                            uri = new Uri($"{Protocol}{MediaUrl}");
                         } else {
                             if (string.IsNullOrWhiteSpace(Password)) {
                                 throw new Exception("Password must not be empty");
                             }
-                            uri = new Uri($"rtsp://{Username}:{Password}@{MediaUrl}");
+                            uri = new Uri($"{Protocol}{Username}:{Password}@{MediaUrl}");
                         }
-                        
 
                         var successfullyOpened = await media.Open(uri);
 
-                        if(!successfullyOpened) {
-                            throw new Exception("Failed to open RTSP Stream");
-                        }
-                        try {
-                            OptionsExpanded = false;
-                            while (media.IsOpen) {
-                                await Task.Delay(TimeSpan.FromMinutes(1), cts.Token);
+                        if (successfullyOpened) {
+                            try {
+                                OptionsExpanded = false;
+                                while (media.IsOpen) {
+                                    await Task.Delay(TimeSpan.FromMinutes(1), cts.Token);
+                                }
+                            } catch (OperationCanceledException) {
                             }
-                        } catch(OperationCanceledException) {
-
                         }
                         await media.Pause();
                         await media.Stop();
                         await media.Close();
+                    } catch(OperationCanceledException) {
                     } catch (Exception ex) {
                         Logger.Error(ex);
                         Notification.ShowError(ex.Message);
@@ -150,23 +162,23 @@ namespace NINA.Plugin.RTSP.Dockables {
 
         public ICommand StartStreamCommand { get; }
         public ICommand StopStreamCommand { get; }
-
-        
     }
+
     /// <summary>
     /// https://docs.microsoft.com/de-de/dotnet/api/system.security.cryptography.protecteddata.protect?view=dotnet-plat-ext-6.0
     /// </summary>
     internal class DataProtection {
-        // Create byte array for additional entropy when using Protect method.
-        static byte[] s_additionalEntropy = { 186, 174, 223, 103, 198, 101, 125, 148, 1, 224 };
 
-        public static byte[] Protect(string data) {   
-            if(string.IsNullOrWhiteSpace(data)) { return null; }
+        // Create byte array for additional entropy when using Protect method.
+        private static byte[] s_additionalEntropy = { 186, 174, 223, 103, 198, 101, 125, 148, 1, 224 };
+
+        public static byte[] Protect(string data) {
+            if (string.IsNullOrWhiteSpace(data)) { return null; }
             return ProtectBytes(Encoding.ASCII.GetBytes(data));
         }
 
         public static string Unprotect(byte[] data) {
-            if(data?.Length == 0) { return string.Empty; }
+            if (data?.Length == 0) { return string.Empty; }
             var bytes = UnprotectBytes(data);
             return Encoding.ASCII.GetString(bytes);
         }

@@ -13,7 +13,7 @@ namespace NINA.Plugin.RTSP.Dockables {
     [Export(typeof(ResourceDictionary))]
     partial class DataTemplates : ResourceDictionary {
         public DataTemplates() {
-            InitializeComponent();
+            InitializeComponent();            
         }
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e) {
@@ -33,15 +33,21 @@ namespace NINA.Plugin.RTSP.Dockables {
         }
 
         private void Media_MediaInitializing(object sender, Unosquare.FFME.Common.MediaInitializingEventArgs e) {
-
-            e.Configuration.PrivateOptions["rtsp_transport"] = "tcp";
-            e.Configuration.GlobalOptions.FlagNoBuffer = true;
-            e.Configuration.ReadTimeout = TimeSpan.FromSeconds(30);
+            if (e.MediaSource.StartsWith("rtsp://", StringComparison.OrdinalIgnoreCase)) { 
+                e.Configuration.PrivateOptions["rtsp_transport"] = "tcp";
+                e.Configuration.GlobalOptions.FlagNoBuffer = true;
+                e.Configuration.ReadTimeout = TimeSpan.FromSeconds(30);
+                e.Configuration.PrivateOptions["user_agent"] = CoreUtil.UserAgent;
+            }
+            if (e.MediaSource.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                 e.MediaSource.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) {
+                e.Configuration.PrivateOptions["user_agent"] = CoreUtil.UserAgent;
+            }
         }
 
         private void Media_MediaFailed(object sender, Unosquare.FFME.Common.MediaFailedEventArgs e) {
             Logger.Error(e.ErrorException);
-            Notification.ShowError("RTSP Stream failed to load: " + e.ErrorException.Message);
+            Notification.ShowError("Stream failed to load: " + e.ErrorException.Message);
         }
     }
 }
