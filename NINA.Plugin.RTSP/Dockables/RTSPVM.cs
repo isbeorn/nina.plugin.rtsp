@@ -1,0 +1,195 @@
+﻿using NINA.Core.Utility;
+using NINA.Core.Utility.Notification;
+using NINA.Equipment.Interfaces.ViewModel;
+using NINA.Profile;
+using NINA.Profile.Interfaces;
+using NINA.WPF.Base.ViewModel;
+using System;
+using System.ComponentModel.Composition;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Unosquare.FFME;
+
+namespace NINA.Plugin.RTSP.Dockables {
+
+    [Export(typeof(IDockableVM))]
+    public class RTSPVM : DockableVM {
+        private CancellationTokenSource cts;
+        private string password;
+        private bool optionsExpanded;
+
+        [ImportingConstructor]
+        public RTSPVM(IProfileService profileService) : base(profileService) {
+            this.Title = "RTSP Player";
+
+            var assembly = this.GetType().Assembly;
+            var id = assembly.GetCustomAttribute<GuidAttribute>().Value;
+            this.pluginSettings = new PluginOptionsAccessor(profileService, Guid.Parse(id));           
+            var encrypt = pluginSettings.GetValueString(nameof(Password), "");
+            try {
+
+                var pw = DataProtection.Unprotect(Convert.FromBase64String(encrypt));
+                Password = pw;
+            } catch(Exception) {
+                Password = "";
+            }
+
+            OptionsExpanded = true;
+            StartStreamCommand = new AsyncCommand<bool>(StartStream);
+            StopStreamCommand = new GalaSoft.MvvmLight.Command.RelayCommand(StopStream);
+        }
+
+        private void StopStream() {
+            try { cts?.Cancel(); } catch (Exception) { }
+        }
+
+        private PluginOptionsAccessor pluginSettings;
+
+        public bool OptionsExpanded {
+            get => optionsExpanded;
+            set {
+                optionsExpanded = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string MediaUrl {
+            get => pluginSettings.GetValueString(nameof(MediaUrl), "");
+            set {
+                pluginSettings.SetValueString(nameof(MediaUrl), value);
+                RaisePropertyChanged();
+            }
+        }
+
+        public string Username {
+            get => pluginSettings.GetValueString(nameof(Username), "");
+            set {
+                pluginSettings.SetValueString(nameof(Username), value);
+                RaisePropertyChanged();
+            }
+        }
+
+        public string Password {
+            get => password;
+            set {
+                password = value;
+
+                if(!string.IsNullOrWhiteSpace(value)) {
+                    var encrypt = DataProtection.Protect(value);
+                    pluginSettings.SetValueString(nameof(Password), Convert.ToBase64String(encrypt));
+                } else {
+                    pluginSettings.SetValueString(nameof(Password), "");
+                }  
+                
+                RaisePropertyChanged();
+            }
+        }
+
+        public void SetPassword(SecureString s) {
+            Password = SecureStringToString(s);
+        }
+
+        string SecureStringToString(SecureString value) {
+            IntPtr valuePtr = IntPtr.Zero;
+            try {
+                valuePtr = Marshal.SecureStringToGlobalAllocUnicode(value);
+                return Marshal.PtrToStringUni(valuePtr);
+            } finally {
+                Marshal.ZeroFreeGlobalAllocUnicode(valuePtr);
+            }
+        }
+
+        private async Task<bool> StartStream(object o) {
+            return await Task.Run(async () => {
+                using (cts = new CancellationTokenSource()) {
+                    try {
+                        var media = o as MediaElement;
+                        Uri uri;
+                        if(string.IsNullOrEmpty(Username)) {
+                            uri = new Uri($"rtsp://{MediaUrl}");
+                        } else {
+                            if (string.IsNullOrWhiteSpace(Password)) {
+                                throw new Exception("Password must not be empty");
+                            }
+                            uri = new Uri($"rtsp://{Username}:{Password}@{MediaUrl}");
+                        }
+                        
+
+                        var successfullyOpened = await media.Open(uri);
+
+                        if(!successfullyOpened) {
+                            throw new Exception("Failed to open RTSP Stream");
+                        }
+                        try {
+                            OptionsExpanded = false;
+                            while (media.IsOpen) {
+                                await Task.Delay(TimeSpan.FromMinutes(1), cts.Token);
+                            }
+                        } catch(OperationCanceledException) {
+
+                        }
+                        await media.Pause();
+                        await media.Stop();
+                        await media.Close();
+                    } catch (Exception ex) {
+                        Logger.Error(ex);
+                        Notification.ShowError(ex.Message);
+                    } finally {
+                        OptionsExpanded = true;
+                    }
+                }
+                return true;
+            });
+        }
+
+        public ICommand StartStreamCommand { get; }
+        public ICommand StopStreamCommand { get; }
+
+        
+    }
+    /// <summary>
+    /// https://docs.microsoft.com/de-de/dotnet/api/system.security.cryptography.protecteddata.protect?view=dotnet-plat-ext-6.0
+    /// </summary>
+    internal class DataProtection {
+        // Create byte array for additional entropy when using Protect method.
+        static byte[] s_additionalEntropy = { 186, 174, 223, 103, 198, 101, 125, 148, 1, 224 };
+
+        public static byte[] Protect(string data) {   
+            if(string.IsNullOrWhiteSpace(data)) { return null; }
+            return ProtectBytes(Encoding.ASCII.GetBytes(data));
+        }
+
+        public static string Unprotect(byte[] data) {
+            if(data?.Length == 0) { return string.Empty; }
+            var bytes = UnprotectBytes(data);
+            return Encoding.ASCII.GetString(bytes);
+        }
+
+        private static byte[] ProtectBytes(byte[] data) {
+            try {
+                // Encrypt the data using DataProtectionScope.CurrentUser. The result can be decrypted
+                // only by the same current user.
+                return ProtectedData.Protect(data, s_additionalEntropy, DataProtectionScope.CurrentUser);
+            } catch (CryptographicException e) {
+                Logger.Error("Data was not encrypted. An error occurred.", e);
+                return null;
+            }
+        }
+
+        private static byte[] UnprotectBytes(byte[] data) {
+            try {
+                //Decrypt the data using DataProtectionScope.CurrentUser.
+                return ProtectedData.Unprotect(data, s_additionalEntropy, DataProtectionScope.CurrentUser);
+            } catch (CryptographicException e) {
+                Logger.Error("Data was not decrypted. An error occurred.", e);
+                return null;
+            }
+        }
+    }
+}

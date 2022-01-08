@@ -1,0 +1,15 @@
+* text=auto
+*.cs text
+*.xaml text
+*.sln text
+*.config text
+*.md text
+*.png binary
+*.sqlite binary
+*.dll filter=lfs diff=lfs merge=lfs -text
+*.lib binary
+*.md3 binary
+*.exe binary
+*.xisf filter=lfs diff=lfs merge=lfs -text
+nina.plugin.rtsp/NINA.Plugin.RTSP/FFMPEG/** filter=lfs diff=lfs merge=lfs -text
+nina.plugin.rtsp/NINA.Plugin.RTSP/FFMPEG/**/* filter=lfs diff=lfs merge=lfs -text
