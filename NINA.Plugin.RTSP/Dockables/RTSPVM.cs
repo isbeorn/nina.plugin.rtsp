@@ -14,6 +14,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Unosquare.FFME;
 
@@ -28,7 +29,11 @@ namespace NINA.Plugin.RTSP.Dockables {
         [ImportingConstructor]
         public RTSPVM(IProfileService profileService) : base(profileService) {
             this.Title = "RTSP Player";
-
+            var dict = new ResourceDictionary();
+            dict.Source = new Uri("NINA.Plugin.RTSP;component/Dockables/DataTemplates.xaml", UriKind.RelativeOrAbsolute);
+            ImageGeometry = (System.Windows.Media.GeometryGroup)dict["NINA.Plugin.RTSP_CameraSVG"];
+            ImageGeometry.Freeze();
+            
             var assembly = this.GetType().Assembly;
             var id = assembly.GetCustomAttribute<GuidAttribute>().Value;
             this.pluginSettings = new PluginOptionsAccessor(profileService, Guid.Parse(id));
@@ -84,7 +89,7 @@ namespace NINA.Plugin.RTSP.Dockables {
         public string Username {
             get => pluginSettings.GetValueString(nameof(Username), "");
             set {
-                pluginSettings.SetValueString(nameof(Username), value);
+                pluginSettings.SetValueString(nameof(Username), System.Web.HttpUtility.UrlEncode(value));
                 RaisePropertyChanged();
             }
         }
@@ -92,7 +97,7 @@ namespace NINA.Plugin.RTSP.Dockables {
         public string Password {
             get => password;
             set {
-                password = value;
+                password = System.Web.HttpUtility.UrlEncode(value);
 
                 if (!string.IsNullOrWhiteSpace(value)) {
                     var encrypt = DataProtection.Protect(value);
