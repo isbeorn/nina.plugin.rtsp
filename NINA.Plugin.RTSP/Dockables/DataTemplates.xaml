@@ -22,7 +22,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <ffme:MediaElement
-                x:Name="Media"
+                x:Name="Media" MediaInitializing="Media_MediaInitializing" MediaFailed="Media_MediaFailed"
                 Background="Transparent"
                 LoadedBehavior="Play"
                 UnloadedBehavior="Stop" />

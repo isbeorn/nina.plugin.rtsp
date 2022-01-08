@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NINA.Core.Utility;
+using NINA.Core.Utility.Notification;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
@@ -28,6 +30,18 @@ namespace NINA.Plugin.RTSP.Dockables {
                     elem.Password = vm.Password;
                 }
             }
+        }
+
+        private void Media_MediaInitializing(object sender, Unosquare.FFME.Common.MediaInitializingEventArgs e) {
+
+            e.Configuration.PrivateOptions["rtsp_transport"] = "tcp";
+            e.Configuration.GlobalOptions.FlagNoBuffer = true;
+            e.Configuration.ReadTimeout = TimeSpan.FromSeconds(30);
+        }
+
+        private void Media_MediaFailed(object sender, Unosquare.FFME.Common.MediaFailedEventArgs e) {
+            Logger.Error(e.ErrorException);
+            Notification.ShowError("RTSP Stream failed to load: " + e.ErrorException.Message);
         }
     }
 }
