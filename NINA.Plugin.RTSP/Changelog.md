@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## Version 1.0.0.3
+- Added descriptions and third party attributions
+- Properly restore password after profile switch
+
 ## Version 1.0.0.2
 - Added a volume slider
 - Enabled some additional flags to reduce latency and CPU usage

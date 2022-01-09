@@ -58,4 +58,11 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyMetadata("ScreenshotURL", "")]
 //An additional example screenshot of your plugin in action
 [assembly: AssemblyMetadata("AltScreenshotURL", "")]
-[assembly: AssemblyMetadata("LongDescription", @"")]
+[assembly: AssemblyMetadata("LongDescription", @"
+With this plugin you can show RTSP video streams using compatible video devices inside N.I.N.A.  
+Head to the imaging tab, open the new RTSP Player panel that will be available and provide the details like username password and the url to the stream.  
+If your camera does not require authentication, just leave the username and password fields blank.
+  
+The plugin is made possible by utilizing the [FFMPEG](https://www.ffmpeg.org/) solution to stream audio and video.  
+Furthermore the video player integration is done using the great [FFMediaElement](https://github.com/unosquare/ffmediaelement) project.  
+")]

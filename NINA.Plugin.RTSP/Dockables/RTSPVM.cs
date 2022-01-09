@@ -37,6 +37,16 @@ namespace NINA.Plugin.RTSP.Dockables {
             var assembly = this.GetType().Assembly;
             var id = assembly.GetCustomAttribute<GuidAttribute>().Value;
             this.pluginSettings = new PluginOptionsAccessor(profileService, Guid.Parse(id));
+            RestorePasswordFromProfile();
+
+            OptionsExpanded = true;
+            StartStreamCommand = new AsyncCommand<bool>(StartStream);
+            StopStreamCommand = new GalaSoft.MvvmLight.Command.RelayCommand(StopStream);
+
+            profileService.ProfileChanged += ProfileService_ProfileChanged;
+        }
+
+        private void RestorePasswordFromProfile() {
             var encrypt = pluginSettings.GetValueString(nameof(Password), "");
             try {
                 var pw = DataProtection.Unprotect(Convert.FromBase64String(encrypt));
@@ -44,10 +54,11 @@ namespace NINA.Plugin.RTSP.Dockables {
             } catch (Exception) {
                 Password = "";
             }
+        }
 
-            OptionsExpanded = true;
-            StartStreamCommand = new AsyncCommand<bool>(StartStream);
-            StopStreamCommand = new GalaSoft.MvvmLight.Command.RelayCommand(StopStream);
+        private void ProfileService_ProfileChanged(object sender, EventArgs e) {
+            RestorePasswordFromProfile();
+            RaiseAllPropertiesChanged();
         }
 
         private void StopStream() {

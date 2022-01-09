@@ -58,6 +58,8 @@ namespace NINA.Plugin.RTSP.Dockables {
         private void Media_MediaOpening(object sender, Unosquare.FFME.Common.MediaOpeningEventArgs e) {
             e.Options.MinimumPlaybackBufferPercent = 0;
             e.Options.IsTimeSyncDisabled = true;
+            e.Options.DecoderParams.EnableFastDecoding = true;
+            e.Options.DecoderParams.EnableLowDelayDecoding = true;
         }
     }
 }

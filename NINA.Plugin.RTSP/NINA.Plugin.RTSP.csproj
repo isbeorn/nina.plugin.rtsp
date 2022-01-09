@@ -313,6 +313,13 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\LICENSE.txt">
+      <Link>LICENSE.txt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="3rd-party-licenses.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="FFMPEG\avcodec-58.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -397,10 +404,14 @@ if not exist "%25localappdata%25\NINA\Plugins\RTSP Client" (
 )
 echo "Copying $(PlatformName) $(TargetFileName)"
 copy "$(TargetDir)$(TargetFileName)" "%25localappdata%25\NINA\Plugins\RTSP Client\$(TargetName).@(VersionNumber)$(TargetExt)" /Y
+copy "$(TargetDir)$(TargetName).pdb" "%25localappdata%25\NINA\Plugins\RTSP Client\$(TargetName).@(VersionNumber).pdb " /Y
 
 copy "$(TargetDir)FFmpeg.AutoGen.dll" "%25localappdata%25\NINA\Plugins\RTSP Client\FFmpeg.AutoGen.dll" /Y
 copy "$(TargetDir)ffme.win.dll" "%25localappdata%25\NINA\Plugins\RTSP Client\ffme.win.dll" /Y
 
-xcopy /s "$(TargetDir)FFMPEG" "%25localappdata%25\NINA\Plugins\RTSP Client"</PostBuildEvent>
+xcopy /s /Y "$(TargetDir)FFMPEG" "%25localappdata%25\NINA\Plugins\RTSP Client"
+
+copy "$(TargetDir)3rd-party-licenses.txt" "%25localappdata%25\NINA\Plugins\RTSP Client\3rd-party-licenses.txt" /Y
+copy "$(TargetDir)LICENSE.txt" "%25localappdata%25\NINA\Plugins\RTSP Client\LICENSE.txt" /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>
