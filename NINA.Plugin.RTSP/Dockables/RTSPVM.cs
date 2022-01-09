@@ -150,8 +150,6 @@ namespace NINA.Plugin.RTSP.Dockables {
                             } catch (OperationCanceledException) {
                             }
                         }
-                        await media.Pause();
-                        await media.Stop();
                         await media.Close();
                     } catch(OperationCanceledException) {
                     } catch (Exception ex) {

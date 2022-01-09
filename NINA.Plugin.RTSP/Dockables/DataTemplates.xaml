@@ -12,8 +12,73 @@
     <converter:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
     <converter:BooleanToVisibilityCollapsedConverter x:Key="BooleanToVisibilityCollapsedConverter" />
     <converter:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+    <converter:PercentageConverter x:Key="PercentageConverter" />
 
 
+    <Style x:Key="VolumeSlider" TargetType="{x:Type Slider}">
+        <Setter Property="Background" Value="{StaticResource ButtonBackgroundBrush}" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Slider}">
+                    <ControlTemplate.Resources>
+                        <Style TargetType="{x:Type RepeatButton}">
+                            <Setter Property="OverridesDefaultStyle" Value="true" />
+                            <Setter Property="IsTabStop" Value="false" />
+                            <Setter Property="Focusable" Value="false" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                        <Border Background="{TemplateBinding Background}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                        <PathGeometry x:Key="Triangle">
+                            <PathFigure StartPoint="0,1">
+                                <LineSegment Point="1,1" />
+                                <LineSegment Point="1,0" />
+                                <LineSegment Point="0,1" />
+                            </PathFigure>
+                        </PathGeometry>
+                    </ControlTemplate.Resources>
+                    <Grid>
+                        <Grid>
+                            <Grid.OpacityMask>
+                                <DrawingBrush>
+                                    <DrawingBrush.Drawing>
+                                        <GeometryDrawing Brush="Black" Geometry="{StaticResource Triangle}" />
+                                    </DrawingBrush.Drawing>
+                                </DrawingBrush>
+                            </Grid.OpacityMask>
+                            <Track Name="PART_Track" Value="{TemplateBinding Value}">
+                                <Track.Thumb>
+                                    <Thumb Width="10" Background="{TemplateBinding Background}">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="{x:Type Thumb}">
+                                                <Border Background="{TemplateBinding Background}" />
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Background="{TemplateBinding Background}" Command="Slider.DecreaseLarge" />
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Background="Transparent" Command="Slider.IncreaseLarge" />
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                        <Path
+                            Data="{StaticResource Triangle}"
+                            Stretch="Fill"
+                            Stroke="{StaticResource BorderBrush}"
+                            StrokeThickness="1" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <GeometryGroup x:Key="NINA.Plugin.RTSP_CameraSVG">
         <PathGeometry Figures="M 30.52,13.332 L 27,13.332 27,9.582 C 27,8.344 25.992,7.332 24.75,7.332 L 0.75,7.332 C 0.336,7.332 0,7.668 0,8.082 0,8.496 0.336,8.832 0.75,8.832 L 24.75,8.832 C 25.164,8.832 25.5,9.168 25.5,9.582 L 25.5,13.332 2.48,13.332 C 1.113,13.332 0,14.445 0,15.813 L 0,34.852 C 0,36.219 1.113,37.332 2.48,37.332 L 30.52,37.332 C 31.887,37.332 33,36.223 33,34.852 L 33,15.813 C 33,14.445 31.887,13.332 30.52,13.332 Z" />
@@ -46,6 +111,7 @@
                 LoadedBehavior="Play"
                 MediaFailed="Media_MediaFailed"
                 MediaInitializing="Media_MediaInitializing"
+                MediaOpening="Media_MediaOpening"
                 UnloadedBehavior="Stop" />
             <Expander
                 Grid.Row="1"
@@ -92,6 +158,20 @@
                         VerticalContentAlignment="Center"
                         HintText="Url"
                         Text="{Binding MediaUrl}" />
+                    <TextBlock
+                        Margin="5,0,0,0"
+                        VerticalAlignment="Center"
+                        Text="| Volume: " />
+
+                    <Slider
+                        Width="100"
+                        Margin="5,0,0,0"
+                        IsMoveToPointEnabled="True"
+                        Maximum="100"
+                        Minimum="0"
+                        Style="{StaticResource VolumeSlider}"
+                        Value="{Binding Volume, ElementName=Media, Converter={StaticResource PercentageConverter}}" />
+
                 </WrapPanel>
             </Expander>
 
@@ -141,6 +221,7 @@
             </Grid>
         </Grid>
     </DataTemplate>
+
 
 
 </ResourceDictionary>

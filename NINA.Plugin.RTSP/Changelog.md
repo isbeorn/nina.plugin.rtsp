@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## Version 1.0.0.2
+- Added a volume slider
+- Enabled some additional flags to reduce latency and CPU usage
+
 ## Version 1.0.0.1
 - Fixed an issue where special characters in username or password were not reloaded correctly after being saved
 
