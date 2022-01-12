@@ -7,12 +7,23 @@
     xmlns:ffme="clr-namespace:Unosquare.FFME;assembly=ffme.win"
     xmlns:ninactrl="clr-namespace:NINACustomControlLibrary;assembly=NINACustomControlLibrary"
     xmlns:ns="clr-namespace:NINA.Core.Locale;assembly=NINA.Core"
-    xmlns:rules="clr-namespace:NINA.Core.Utility.ValidationRules;assembly=NINA.Core"
-    xmlns:util="clr-namespace:NINA.Core.Utility;assembly=NINA.Core">
+    xmlns:rules="clr-namespace:NINA.Core.Utility.ValidationRules;assembly=NINA.Core">
     <converter:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
     <converter:BooleanToVisibilityCollapsedConverter x:Key="BooleanToVisibilityCollapsedConverter" />
     <converter:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
     <converter:PercentageConverter x:Key="PercentageConverter" />
+
+
+    <GeometryGroup x:Key="RTSP_UnmuteSVG">
+        <PathGeometry Figures="M 9.96933,-0.306665C 9.75467,-0.301332 9.54667,-0.222666 9.37467,-0.0879993L 4.65067,3.69333L 1,3.69333C 0.448,3.69333 0,4.14133 0,4.69333L 0,10.6933C 0,11.2453 0.448,11.6933 1,11.6933L 4.65067,11.6933L 9.37467,15.4747C 10.0307,16 11,15.532 11,14.6933L 11,0.693334C 11,0.130668 10.536,-0.322666 9.96933,-0.306665 Z M 9,2.77733L 9,12.6107L 5.62533,9.912C 5.448,9.772 5.22933,9.69333 5,9.69333L 2,9.69333L 2,5.69333L 5,5.69333C 5.22933,5.69333 5.448,5.61467 5.62533,5.47467" />
+        <PathGeometry Figures="M 18.0627,-0.385332C 17.1613,-0.385332 16.7187,0.704001 17.364,1.32933C 20.8853,4.85467 20.8853,10.532 17.364,14.0573C 16.9587,14.444 16.9533,15.0893 17.3493,15.4853C 17.7453,15.8813 18.3907,15.876 18.776,15.4693C 23.0627,11.1827 23.0627,4.204 18.776,-0.0826664C 18.588,-0.275999 18.328,-0.385332 18.0627,-0.385332 Z M 14.5307,3.14133C 13.6307,3.14133 13.188,4.23467 13.8333,4.86C 15.4013,6.43333 15.4013,8.944 13.8333,10.516C 13.4427,10.9067 13.4427,11.5427 13.8333,11.9333C 14.224,12.324 14.86,12.3187 15.2507,11.928C 17.584,9.59467 17.584,5.78133 15.2507,3.448C 15.0573,3.25067 14.8027,3.14133 14.5307,3.14133 Z " />
+    </GeometryGroup>
+
+    <GeometryGroup x:Key="RTSP_MuteSVG">
+        <PathGeometry Figures="M 9.96933,-0.306665C 9.75467,-0.301332 9.54667,-0.222666 9.37467,-0.0879993L 4.65067,3.69333L 1,3.69333C 0.448,3.69333 0,4.14133 0,4.69333L 0,10.6933C 0,11.2453 0.448,11.6933 1,11.6933L 4.65067,11.6933L 9.37467,15.4747C 10.0307,16 11,15.532 11,14.6933L 11,0.693334C 11,0.130666 10.536,-0.322668 9.96933,-0.306665 Z M 9,2.77733L 9,12.6107L 5.62533,9.912C 5.448,9.772 5.22933,9.69333 5,9.69333L 2,9.69333L 2,5.69333L 5,5.69333C 5.22933,5.69333 5.448,5.61467 5.62533,5.47467" />
+        <PathGeometry Figures="M 21.9787,3.68267C 21.7187,3.69333 21.4733,3.79733 21.292,3.98533L 15.292,9.98533C 14.8907,10.376 14.88,11.016 15.276,11.4173C 15.6773,11.8133 16.3173,11.8027 16.708,11.4013L 22.708,5.40133C 23.36,4.76667 22.8907,3.65733 21.9787,3.68267 Z " />
+        <PathGeometry Figures="M 15.9893,3.68267C 15.0933,3.68267 14.6507,4.77733 15.292,5.40133L 21.292,11.4013C 21.6827,11.8027 22.3227,11.8133 22.724,11.4173C 23.12,11.016 23.1093,10.376 22.708,9.98533L 16.708,3.98533C 16.5213,3.792 16.26,3.68267 15.9893,3.68267 Z " />
+    </GeometryGroup>
 
 
     <Style x:Key="VolumeSlider" TargetType="{x:Type Slider}">
@@ -108,11 +119,13 @@
             <ffme:MediaElement
                 x:Name="Media"
                 Background="Transparent"
+                IsMuted="{Binding IsMuted, Mode=TwoWay}"
                 LoadedBehavior="Play"
                 MediaFailed="Media_MediaFailed"
                 MediaInitializing="Media_MediaInitializing"
                 MediaOpening="Media_MediaOpening"
-                UnloadedBehavior="Stop" />
+                UnloadedBehavior="Stop"
+                Volume="{Binding Volume, Mode=TwoWay}" />
             <Expander
                 Grid.Row="1"
                 Margin="0,5,0,0"
@@ -163,14 +176,88 @@
                         VerticalAlignment="Center"
                         Text="| Volume: " />
 
-                    <Slider
-                        Width="100"
-                        Margin="5,0,0,0"
-                        IsMoveToPointEnabled="True"
-                        Maximum="100"
-                        Minimum="0"
-                        Style="{StaticResource VolumeSlider}"
-                        Value="{Binding Volume, ElementName=Media, Converter={StaticResource PercentageConverter}}" />
+                    <ToggleButton Width="25" IsChecked="{Binding IsMuted, Mode=TwoWay}">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton">
+                                <Setter Property="Background" Value="{StaticResource BackgroundBrush}" />
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                                <Setter Property="FontSize" Value="15" />
+                                <Setter Property="SnapsToDevicePixels" Value="True" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                            <Border
+                                                x:Name="border"
+                                                BorderBrush="Transparent"
+                                                BorderThickness="0">
+                                                <Border Background="{TemplateBinding Background}" CornerRadius="1">
+                                                    <Grid>
+                                                        <ContentPresenter
+                                                            x:Name="MyContentPresenter"
+                                                            Margin="0,0,0,0"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center"
+                                                            Content="{TemplateBinding Content}" />
+                                                    </Grid>
+                                                </Border>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Foreground" Value="{StaticResource ButtonForegroundBrush}" />
+                                                    <Setter Property="Background" Value="{StaticResource ButtonBackgroundSelectedBrush}" />
+                                                </Trigger>
+                                                <Trigger Property="IsEnabled" Value="False">
+                                                    <Setter Property="Opacity" Value="0.4" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <Path
+                                                    Margin="5"
+                                                    Data="{StaticResource RTSP_MuteSVG}"
+                                                    Fill="{StaticResource ButtonForegroundBrush}"
+                                                    Stretch="Uniform" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Trigger>
+                                    <Trigger Property="IsChecked" Value="False">
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <Path
+                                                    Margin="5"
+                                                    Data="{StaticResource RTSP_UnmuteSVG}"
+                                                    Fill="{StaticResource ButtonForegroundBrush}"
+                                                    Stretch="Uniform" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+
+                    <Grid>
+                        <TextBlock
+                            Margin="5,0,0,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Text="{Binding Volume, StringFormat=\{0:#%\}}" />
+                        <Slider
+                            Width="100"
+                            Margin="5,0,0,0"
+                            IsMoveToPointEnabled="True"
+                            Maximum="100"
+                            Minimum="0"
+                            Style="{StaticResource VolumeSlider}"
+                            Value="{Binding Volume, Converter={StaticResource PercentageConverter}}" />
+                    </Grid>
+
 
                 </WrapPanel>
             </Expander>

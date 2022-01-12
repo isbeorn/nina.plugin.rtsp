@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## Version 1.0.0.4
+- Volume is now saved into the profile
+- Added a mute/unmute button, selection is also saved to the profile
+
 ## Version 1.0.0.3
 - Added descriptions and third party attributions
 - Properly restore password after profile switch

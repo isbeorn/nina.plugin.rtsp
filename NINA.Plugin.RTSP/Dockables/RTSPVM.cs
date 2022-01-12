@@ -81,6 +81,23 @@ namespace NINA.Plugin.RTSP.Dockables {
             "https://"
         };
 
+
+        public bool IsMuted {
+            get => pluginSettings.GetValueBoolean(nameof(IsMuted), false);
+            set {
+                pluginSettings.SetValueBoolean(nameof(IsMuted), value);
+                RaisePropertyChanged();
+            }
+        }
+
+        public double Volume {
+            get => pluginSettings.GetValueDouble(nameof(Volume), 1.0d);
+            set {
+                pluginSettings.SetValueDouble(nameof(Volume), value);
+                RaisePropertyChanged();
+            }
+        }
+
         public string Protocol {
             get => pluginSettings.GetValueString(nameof(Protocol), "rtsp://");
             set {
