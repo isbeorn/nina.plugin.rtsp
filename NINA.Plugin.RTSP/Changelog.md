@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## Version 1.0.0.5
+- Added RTSPS to the list of available protocols
+
 ## Version 1.0.0.4
 - Volume is now saved into the profile
 - Added a mute/unmute button, selection is also saved to the profile

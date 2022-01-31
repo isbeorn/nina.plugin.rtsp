@@ -77,6 +77,7 @@ namespace NINA.Plugin.RTSP.Dockables {
 
         public List<string> Protocols => new List<string>() {
             "rtsp://",
+            "rtsps://",
             "http://",
             "https://"
         };
