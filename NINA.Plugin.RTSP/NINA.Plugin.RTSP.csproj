@@ -402,14 +402,20 @@ if not exist "%25localappdata%25\NINA\Plugins\RTSP Client" (
     echo "Creating %25localappdata%25\NINA\Plugin\RTSP Client folder"
     mkdir  "%25localappdata%25\NINA\Plugins\RTSP Client"
 )
+
+if not exist "%25localappdata%25\NINA\Plugins\RTSP Client\dll" (
+    echo "Creating %25localappdata%25\NINA\Plugin\RTSP Client\dll folder"
+    mkdir  "%25localappdata%25\NINA\Plugins\RTSP Client\dll"
+)
+
 echo "Copying $(PlatformName) $(TargetFileName)"
 copy "$(TargetDir)$(TargetFileName)" "%25localappdata%25\NINA\Plugins\RTSP Client\$(TargetName).@(VersionNumber)$(TargetExt)" /Y
 copy "$(TargetDir)$(TargetName).pdb" "%25localappdata%25\NINA\Plugins\RTSP Client\$(TargetName).@(VersionNumber).pdb " /Y
 
-copy "$(TargetDir)FFmpeg.AutoGen.dll" "%25localappdata%25\NINA\Plugins\RTSP Client\FFmpeg.AutoGen.dll" /Y
-copy "$(TargetDir)ffme.win.dll" "%25localappdata%25\NINA\Plugins\RTSP Client\ffme.win.dll" /Y
+copy "$(TargetDir)FFmpeg.AutoGen.dll" "%25localappdata%25\NINA\Plugins\RTSP Client\dll\FFmpeg.AutoGen.dll" /Y
+copy "$(TargetDir)ffme.win.dll" "%25localappdata%25\NINA\Plugins\RTSP Client\dll\ffme.win.dll" /Y
 
-xcopy /s /Y "$(TargetDir)FFMPEG" "%25localappdata%25\NINA\Plugins\RTSP Client"
+xcopy /s /Y "$(TargetDir)FFMPEG" "%25localappdata%25\NINA\Plugins\RTSP Client\dll"
 
 copy "$(TargetDir)3rd-party-licenses.txt" "%25localappdata%25\NINA\Plugins\RTSP Client\3rd-party-licenses.txt" /Y
 copy "$(TargetDir)LICENSE.txt" "%25localappdata%25\NINA\Plugins\RTSP Client\LICENSE.txt" /Y</PostBuildEvent>

@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## Version 1.0.0.6
+- Folder restructure for faster startup
+
 ## Version 1.0.0.5
 - Added RTSPS to the list of available protocols
 
