@@ -40,8 +40,14 @@ namespace NINA.Plugin.RTSP.Dockables {
                     e.Configuration.PrivateOptions["rtsp_transport"] = "tcp";
                     e.Configuration.GlobalOptions.FlagNoBuffer = true;
                     e.Configuration.GlobalOptions.EnableReducedBuffering = true;
-                    e.Configuration.ReadTimeout = TimeSpan.FromSeconds(30);
+                    e.Configuration.ReadTimeout = TimeSpan.FromSeconds(5);
                     e.Configuration.PrivateOptions["user_agent"] = CoreUtil.UserAgent;
+
+                    e.Configuration.GlobalOptions.ProbeSize = 8192;
+                    e.Configuration.GlobalOptions.MaxAnalyzeDuration = TimeSpan.FromSeconds(1);
+                    e.Configuration.GlobalOptions.FlagDiscardCorrupt = true;
+                    // AVIO Flags Direct (chewie#7309 from experimentation)
+                    e.Configuration.GlobalOptions.FlagSortDts = true;
                 }
                 if (e.MediaSource.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
                      e.MediaSource.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) {

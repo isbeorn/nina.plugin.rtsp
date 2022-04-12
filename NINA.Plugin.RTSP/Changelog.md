@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## Version 1.0.0.7
+- Add further flags to try to reduce delays, proposed by chewie#7309
+
 ## Version 1.0.0.6
 - Folder restructure for faster startup
 
