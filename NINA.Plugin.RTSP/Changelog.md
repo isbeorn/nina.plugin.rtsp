@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## Version 1.0.1.0
+- More than one source can now be defined to quickly switch between them
+
 ## Version 1.0.0.7
 - Add further flags to try to reduce delays, proposed by chewie#7309
 

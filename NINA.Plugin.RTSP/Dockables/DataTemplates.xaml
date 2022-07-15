@@ -102,6 +102,7 @@
                 <RowDefinition />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <StackPanel
                 x:Name="LoadingControl"
@@ -126,18 +127,54 @@
                 MediaOpening="Media_MediaOpening"
                 UnloadedBehavior="Stop"
                 Volume="{Binding Volume, Mode=TwoWay}" />
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ComboBox
+                    MinWidth="80"
+                    DisplayMemberPath="MediaUrl"
+                    ItemsSource="{Binding Sources}"
+                    SelectedItem="{Binding SelectedSource}" />
+                <Button
+                    Grid.Column="1"
+                    Width="20"
+                    Margin="5,0,0,0"
+                    Command="{Binding AddSourceCommand}">
+                    <Path
+                        Margin="5"
+                        Data="{StaticResource AddSVG}"
+                        Fill="{StaticResource ButtonForegroundBrush}"
+                        Stretch="Uniform" />
+                </Button>
+                <Button
+                    Grid.Column="2"
+                    Width="20"
+                    Margin="5,0,0,0"
+                    Command="{Binding DeleteSourceCommand}">
+                    <Path
+                        Margin="5"
+                        Data="{StaticResource TrashCanSVG}"
+                        Fill="{StaticResource ButtonForegroundBrush}"
+                        Stretch="Uniform" />
+                </Button>
+            </Grid>
+
             <Expander
-                Grid.Row="1"
+                Grid.Row="2"
                 Margin="0,5,0,0"
                 Header="Stream source"
                 IsExpanded="{Binding OptionsExpanded}">
                 <WrapPanel Orientation="Horizontal">
-                    <ComboBox ItemsSource="{Binding Protocols}" SelectedItem="{Binding Protocol}" />
+                    <ComboBox ItemsSource="{Binding Protocols}" SelectedItem="{Binding SelectedSource.Protocol}" />
                     <ninactrl:HintTextBox
                         MinWidth="80"
                         Margin="5,0,0,0"
                         VerticalAlignment="Center"
                         VerticalContentAlignment="Center"
+                        DataContext="{Binding SelectedSource}"
                         HintText="Username"
                         Text="{Binding Username}" />
                     <TextBlock
@@ -169,6 +206,7 @@
                         Margin="5,0,0,0"
                         VerticalAlignment="Center"
                         VerticalContentAlignment="Center"
+                        DataContext="{Binding SelectedSource}"
                         HintText="Url"
                         Text="{Binding MediaUrl}" />
                     <TextBlock
@@ -264,7 +302,7 @@
 
 
             <Grid
-                Grid.Row="2"
+                Grid.Row="3"
                 Height="25"
                 Margin="0,5,0,0">
                 <Grid Visibility="{Binding StartStreamCommand.Execution, Converter={StaticResource NullToVisibilityConverter}}">

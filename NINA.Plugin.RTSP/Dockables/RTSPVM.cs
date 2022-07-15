@@ -1,4 +1,6 @@
-﻿using NINA.Core.Utility;
+﻿using Newtonsoft.Json;
+using NINA.Core.MyMessageBox;
+using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
 using NINA.Equipment.Interfaces.ViewModel;
 using NINA.Profile;
@@ -7,6 +9,7 @@ using NINA.WPF.Base.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -23,7 +26,6 @@ namespace NINA.Plugin.RTSP.Dockables {
     [Export(typeof(IDockableVM))]
     public class RTSPVM : DockableVM {
         private CancellationTokenSource cts;
-        private string password;
         private bool optionsExpanded;
 
         [ImportingConstructor]
@@ -37,28 +39,95 @@ namespace NINA.Plugin.RTSP.Dockables {
             var assembly = this.GetType().Assembly;
             var id = assembly.GetCustomAttribute<GuidAttribute>().Value;
             this.pluginSettings = new PluginOptionsAccessor(profileService, Guid.Parse(id));
-            RestorePasswordFromProfile();
-
+            
             OptionsExpanded = true;
             StartStreamCommand = new AsyncCommand<bool>(StartStream);
             StopStreamCommand = new GalaSoft.MvvmLight.Command.RelayCommand(StopStream);
+            AddSourceCommand = new RelayCommand(AddSource);
+            DeleteSourceCommand = new RelayCommand(DeleteSource);
 
+            ReadSources();
             profileService.ProfileChanged += ProfileService_ProfileChanged;
+
         }
 
-        private void RestorePasswordFromProfile() {
-            var encrypt = pluginSettings.GetValueString(nameof(Password), "");
+        private void ReadSources() {
+            Sources = new AsyncObservableCollection<RTSPSource>(FromStringToList<RTSPSource>(pluginSettings.GetValueString(nameof(Sources), "")));
+
+            if (Sources.Count == 0) {
+                var source = new RTSPSource {
+                    Username = pluginSettings.GetValueString(nameof(Username), "<username>"),
+                    Password = pluginSettings.GetValueString(nameof(Password), ""),
+                    Protocol = pluginSettings.GetValueString(nameof(Protocol), "rtsp://"),
+                    MediaUrl = pluginSettings.GetValueString(nameof(MediaUrl), "<media url>")
+                };
+                Sources.Add(source);
+                SelectedSource = source;
+            } else {
+                SelectedSource = Sources.First();
+            }
+        }
+
+        private void DeleteSource(object obj) {
+            if(Sources.Count > 0 && SelectedSource != null) {
+                if(MyMessageBox.Show($"Delete source @ {SelectedSource.MediaUrl}?", "Delete source", MessageBoxButton.YesNo, MessageBoxResult.No) == MessageBoxResult.Yes) { 
+                    Sources.Remove(SelectedSource);
+                    SaveSources();
+                }
+            }
+            
+            if(Sources.Count > 0) {
+                SelectedSource = Sources.First();
+            } else {
+                AddSource(null);
+            }
+
+        }
+
+        private void AddSource(object obj) {
+            var source = new RTSPSource {
+                Username = "<username>",
+                Password = "",
+                Protocol = "rtsp://",
+                MediaUrl = "<media url>"
+            };
+            Sources.Add(source);
+            SelectedSource = source;
+        }
+
+        private void SaveSources() {
+            var sourcesAsString = FromListToString<RTSPSource>(Sources);
+            pluginSettings.SetValueString(nameof(Sources), sourcesAsString);
+        }
+
+        public static IList<T> FromStringToList<T>(string collection) {
             try {
-                var pw = DataProtection.Unprotect(Convert.FromBase64String(encrypt));
-                Password = pw;
+                return JsonConvert.DeserializeObject<IList<T>>(collection, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto }) ?? new List<T>();
             } catch (Exception) {
-                Password = "";
+                return new List<T>();
+            }
+
+        }
+
+        public static string FromListToString<T>(IList<T> l) {
+            try {
+                return JsonConvert.SerializeObject(l, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto }) ?? "";
+            } catch (Exception) {
+                return "";
+            }
+        }
+
+        private string Decrypt(string encrypt) {
+            try {
+                return DataProtection.Unprotect(Convert.FromBase64String(encrypt));
+            } catch (Exception) {
+                return "";
             }
         }
 
         private void ProfileService_ProfileChanged(object sender, EventArgs e) {
-            RestorePasswordFromProfile();
-            RaiseAllPropertiesChanged();
+            StopStream();
+            ReadSources();
         }
 
         private void StopStream() {
@@ -97,46 +166,86 @@ namespace NINA.Plugin.RTSP.Dockables {
                 pluginSettings.SetValueDouble(nameof(Volume), value);
                 RaisePropertyChanged();
             }
-        }
+        }        
 
         public string Protocol {
-            get => pluginSettings.GetValueString(nameof(Protocol), "rtsp://");
+            get => SelectedSource?.Protocol ?? "rtsp://";
             set {
-                pluginSettings.SetValueString(nameof(Protocol), value);
+                if (SelectedSource == null) return;
+
+                SelectedSource.Protocol = value;
                 RaisePropertyChanged();
+                SaveSources();
             }
         }
 
         public string MediaUrl {
-            get => pluginSettings.GetValueString(nameof(MediaUrl), "");
+            get => SelectedSource?.MediaUrl ?? "";
             set {
-                pluginSettings.SetValueString(nameof(MediaUrl), value);
+                if (SelectedSource == null) return;
+
+                SelectedSource.MediaUrl = value;
                 RaisePropertyChanged();
+                SaveSources();
             }
         }
 
         public string Username {
-            get => pluginSettings.GetValueString(nameof(Username), "");
+            get => SelectedSource?.Username ?? "";
             set {
-                pluginSettings.SetValueString(nameof(Username), value);
+                if (SelectedSource == null) return;
+
+                SelectedSource.Username = value;
                 RaisePropertyChanged();
+                SaveSources();
             }
         }
 
         public string Password {
-            get => password;
+            get => Decrypt(SelectedSource?.Password ?? "");
             set {
-                password = value;
+                if (SelectedSource == null) return;
 
                 if (!string.IsNullOrWhiteSpace(value)) {
                     var encrypt = DataProtection.Protect(value);
-                    pluginSettings.SetValueString(nameof(Password), Convert.ToBase64String(encrypt));
+                    SelectedSource.Password = Convert.ToBase64String(encrypt);
                 } else {
-                    pluginSettings.SetValueString(nameof(Password), "");
+                    SelectedSource.Password = "";
                 }
 
                 RaisePropertyChanged();
+                SaveSources();
             }
+        }
+
+        private AsyncObservableCollection<RTSPSource> sources;
+        public AsyncObservableCollection<RTSPSource> Sources {
+            get => sources;
+            set {
+                sources = value;
+
+            }
+        }
+
+        private RTSPSource selectedSource;
+        public RTSPSource SelectedSource {
+            get => selectedSource;
+            set {
+                selectedSource = value;
+                RaisePropertyChanged();
+                if(selectedSource != null && media != null && media.IsOpen) {                    
+                    StopStream();
+                    if((SelectedSource.MediaUrl != "") && (SelectedSource.MediaUrl != "<media url>")) {
+                        _ = RestartStream(media);
+                    }                    
+                }
+            }
+        }
+        private async Task RestartStream(MediaElement media) {
+            while(media.IsOpen) {
+                await Task.Delay(100);
+            }
+            await StartStreamCommand.ExecuteAsync(media);
         }
 
         public void SetPassword(SecureString s) {
@@ -153,11 +262,13 @@ namespace NINA.Plugin.RTSP.Dockables {
             }
         }
 
+        private MediaElement media;
+
         private async Task<bool> StartStream(object o) {
             return await Task.Run(async () => {
                 using (cts = new CancellationTokenSource()) {
                     try {
-                        var media = o as MediaElement;
+                        media = o as MediaElement;
                         Uri uri;
                         if (string.IsNullOrEmpty(Username)) {
                             uri = new Uri($"{Protocol}{MediaUrl}");
@@ -192,8 +303,10 @@ namespace NINA.Plugin.RTSP.Dockables {
             });
         }
 
-        public ICommand StartStreamCommand { get; }
+        public IAsyncCommand StartStreamCommand { get; }
         public ICommand StopStreamCommand { get; }
+        public ICommand AddSourceCommand { get; }
+        public ICommand DeleteSourceCommand { get; }
     }
 
     /// <summary>
@@ -235,5 +348,17 @@ namespace NINA.Plugin.RTSP.Dockables {
                 return null;
             }
         }
+    }
+
+
+
+    [JsonObject(MemberSerialization.OptOut)]
+    public class RTSPSource {
+        public string Username { get; set; }
+
+        public string Password { get; set; }
+
+        public string Protocol { get; set; }
+        public string MediaUrl { get; set; }
     }
 }
