@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## Version 2.0.0.0
+- Upgrade to .NET7
+
 ## Version 1.0.1.0
 - More than one source can now be defined to quickly switch between them
 
