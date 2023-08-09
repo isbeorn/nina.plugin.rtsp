@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Unosquare.FFME.Common;
 
 namespace NINA.Plugin.RTSP.Dockables {
     [Export(typeof(ResourceDictionary))]
@@ -57,8 +59,17 @@ namespace NINA.Plugin.RTSP.Dockables {
         }
 
         private void Media_MediaFailed(object sender, Unosquare.FFME.Common.MediaFailedEventArgs e) {
-            Logger.Error(e.ErrorException);
-            Notification.ShowError("Stream failed to load: " + e.ErrorException.Message);
+            var reg = new Regex("(?<=\\//)(.*?)(?=\\@)");
+            var match = reg.Match(e.ErrorException.Message);
+
+            var error = e.ErrorException.Message;
+            
+            if(match.Success) {
+                error = error.Replace(match.Value, "xxx:xxx");
+            }
+
+            Logger.Error(error);
+            Notification.ShowError("Stream failed to load: " + error);
         }
 
         private void Media_MediaOpening(object sender, Unosquare.FFME.Common.MediaOpeningEventArgs e) {
