@@ -43,7 +43,7 @@ pipelines:
               - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/ffme.win.dll ${BITBUCKET_CLONE_DIR}/packages/ffme.win.dll
               - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/3rd-party-licenses.txt ${BITBUCKET_CLONE_DIR}/packages/3rd-party-licenses.txt
               - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/LICENSE.txt ${BITBUCKET_CLONE_DIR}/packages/LICENSE.txt
-              - cp -a NINA.Plugin.RTSP/bin/Release/net7.0-windows/FFMPEG/. ${BITBUCKET_CLONE_DIR}/packages/dll/
+              - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/FFMPEG/. ${BITBUCKET_CLONE_DIR}/packages/dll/
 
             artifacts:
               - packages/**
