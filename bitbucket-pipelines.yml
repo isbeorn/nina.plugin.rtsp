@@ -26,6 +26,7 @@ pipelines:
               ## Create artifact folders
               - mkdir -p ${BITBUCKET_CLONE_DIR}/artifacts
               - mkdir -p ${BITBUCKET_CLONE_DIR}/packages  
+              - mkdir -p ${BITBUCKET_CLONE_DIR}/packages/dll
               
                 ## Get latest manifest creation script
               - curl https://api.bitbucket.org/2.0/repositories/isbeorn/nina.plugin.manifests/src/main/tools/CreateNET7Manifest.ps1 >> ${BITBUCKET_CLONE_DIR}/artifacts/CreateNET7Manifest.ps1
