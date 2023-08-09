@@ -27,6 +27,7 @@ pipelines:
               - mkdir -p ${BITBUCKET_CLONE_DIR}/artifacts
               - mkdir -p ${BITBUCKET_CLONE_DIR}/packages  
               - mkdir -p ${BITBUCKET_CLONE_DIR}/packages/dll
+              - chmod -R 777 ${BITBUCKET_CLONE_DIR}/packages/dll
               
                 ## Get latest manifest creation script
               - curl https://api.bitbucket.org/2.0/repositories/isbeorn/nina.plugin.manifests/src/main/tools/CreateNET7Manifest.ps1 >> ${BITBUCKET_CLONE_DIR}/artifacts/CreateNET7Manifest.ps1
@@ -45,7 +46,8 @@ pipelines:
               - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/3rd-party-licenses.txt ${BITBUCKET_CLONE_DIR}/packages/3rd-party-licenses.txt
               - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/LICENSE.txt ${BITBUCKET_CLONE_DIR}/packages/LICENSE.txt
               - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/FFMPEG/* ${BITBUCKET_CLONE_DIR}/packages/dll
-
+              
+              - chmod -R 777 ${BITBUCKET_CLONE_DIR}/packages/dll
             artifacts:
               - packages/**
               - artifacts/CreateNET7Manifest.ps1
