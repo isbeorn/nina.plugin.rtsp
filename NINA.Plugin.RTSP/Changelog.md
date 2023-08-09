@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## Version 2.0.0.1
+- Obfuscate username and password on error for log and popup
+
 ## Version 2.0.0.0
 - Upgrade to .NET7
 
