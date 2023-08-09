@@ -3,7 +3,8 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <UseWindowsForms>true</UseWindowsForms>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
@@ -62,31 +63,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FFME.Windows" Version="4.4.350" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.346202">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="NINA.Plugin" Version="3.0.0.1001-preview1" />
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
-  </ItemGroup>
-  <Target Name="PostBuildMacros">
-    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
-      <Output TaskParameter="Assemblies" ItemName="Targets" />
-    </GetAssemblyIdentity>
-    <ItemGroup>
-      <VersionNumber Include="@(Targets->'%(Version)')" />
-    </ItemGroup>
-  </Target>
-  <PropertyGroup>
-    <PostBuildEventDependsOn>
-			$(PostBuildEventDependsOn);
-			PostBuildMacros;
-		</PostBuildEventDependsOn>
-  </PropertyGroup>
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="NINA.Plugin" Version="3.0.0.1031-nightly" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release (&#xD;&#xA;    echo  &quot;Trying to sign $(TargetPath)&quot;&#xD;&#xA;    signtool sign /t http://timestamp.digicert.com /v /a /fd SHA256 $(TargetPath)&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;if not exist &quot;%25localappdata%25\NINA\Plugins&quot; (&#xD;&#xA;    echo &quot;Creating Plugins %25localappdata%25\NINA\Plugins folder&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins&quot;&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;if exist &quot;%25localappdata%25\NINA\Plugins\RTSP Client&quot; (&#xD;&#xA;    echo &quot; folder cleanup&quot;&#xD;&#xA;    rmdir &quot;%25localappdata%25\NINA\Plugins\RTSP Client&quot; /S /Q&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;if not exist &quot;%25localappdata%25\NINA\Plugins\RTSP Client&quot; (&#xD;&#xA;    echo &quot;Creating %25localappdata%25\NINA\Plugin\RTSP Client folder&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins\RTSP Client&quot;&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;if not exist &quot;%25localappdata%25\NINA\Plugins\RTSP Client\dll&quot; (&#xD;&#xA;    echo &quot;Creating %25localappdata%25\NINA\Plugin\RTSP Client\dll folder&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins\RTSP Client\dll&quot;&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;echo &quot;Copying $(PlatformName) $(TargetFileName)&quot;&#xD;&#xA;copy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;%25localappdata%25\NINA\Plugins\RTSP Client\$(TargetName).@(VersionNumber)$(TargetExt)&quot; /Y&#xD;&#xA;copy &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;%25localappdata%25\NINA\Plugins\RTSP Client\$(TargetName).@(VersionNumber).pdb &quot; /Y&#xD;&#xA;&#xD;&#xA;copy &quot;$(TargetDir)FFmpeg.AutoGen.dll&quot; &quot;%25localappdata%25\NINA\Plugins\RTSP Client\FFmpeg.AutoGen.dll&quot; /Y&#xD;&#xA;copy &quot;$(TargetDir)ffme.win.dll&quot; &quot;%25localappdata%25\NINA\Plugins\RTSP Client\ffme.win.dll&quot; /Y&#xD;&#xA;&#xD;&#xA;xcopy /s /Y &quot;$(TargetDir)FFMPEG&quot; &quot;%25localappdata%25\NINA\Plugins\RTSP Client\dll&quot;&#xD;&#xA;&#xD;&#xA;copy &quot;$(TargetDir)3rd-party-licenses.txt&quot; &quot;%25localappdata%25\NINA\Plugins\RTSP Client\3rd-party-licenses.txt&quot; /Y&#xD;&#xA;copy &quot;$(TargetDir)LICENSE.txt&quot; &quot;%25localappdata%25\NINA\Plugins\RTSP Client\LICENSE.txt&quot; /Y" />
+    <Exec IgnoreExitCode="true" Command="if $(ConfigurationName) == Debug (&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;if not exist &quot;%25localappdata%25\NINA\Plugins&quot; (&#xD;&#xA;    echo &quot;Creating Plugins %25localappdata%25\NINA\Plugins folder&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins&quot;&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;if exist &quot;%25localappdata%25\NINA\Plugins\RTSP Client&quot; (&#xD;&#xA;    echo &quot; folder cleanup&quot;&#xD;&#xA;    rmdir &quot;%25localappdata%25\NINA\Plugins\RTSP Client&quot; /S /Q&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;if not exist &quot;%25localappdata%25\NINA\Plugins\RTSP Client&quot; (&#xD;&#xA;    echo &quot;Creating %25localappdata%25\NINA\Plugin\RTSP Client folder&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins\RTSP Client&quot;&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;if not exist &quot;%25localappdata%25\NINA\Plugins\RTSP Client\dll&quot; (&#xD;&#xA;    echo &quot;Creating %25localappdata%25\NINA\Plugin\RTSP Client\dll folder&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins\RTSP Client\dll&quot;&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;echo &quot;Copying $(PlatformName) $(TargetFileName)&quot;&#xD;&#xA;copy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;%25localappdata%25\NINA\Plugins\RTSP Client\$(TargetName).@(VersionNumber)$(TargetExt)&quot; /Y&#xD;&#xA;copy &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;%25localappdata%25\NINA\Plugins\RTSP Client\$(TargetName).@(VersionNumber).pdb &quot; /Y&#xD;&#xA;&#xD;&#xA;copy &quot;$(TargetDir)FFmpeg.AutoGen.dll&quot; &quot;%25localappdata%25\NINA\Plugins\RTSP Client\FFmpeg.AutoGen.dll&quot; /Y&#xD;&#xA;copy &quot;$(TargetDir)ffme.win.dll&quot; &quot;%25localappdata%25\NINA\Plugins\RTSP Client\ffme.win.dll&quot; /Y&#xD;&#xA;&#xD;&#xA;xcopy /s /Y &quot;$(TargetDir)FFMPEG&quot; &quot;%25localappdata%25\NINA\Plugins\RTSP Client\dll&quot;&#xD;&#xA;&#xD;&#xA;copy &quot;$(TargetDir)3rd-party-licenses.txt&quot; &quot;%25localappdata%25\NINA\Plugins\RTSP Client\3rd-party-licenses.txt&quot; /Y&#xD;&#xA;copy &quot;$(TargetDir)LICENSE.txt&quot; &quot;%25localappdata%25\NINA\Plugins\RTSP Client\LICENSE.txt&quot; /Y&#xD;&#xA;&#xD;&#xA;)" />
   </Target>
 </Project>
