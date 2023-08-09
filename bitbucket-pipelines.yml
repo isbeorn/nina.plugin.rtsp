@@ -31,8 +31,8 @@ pipelines:
               - curl https://api.bitbucket.org/2.0/repositories/isbeorn/nina.plugin.manifests/src/main/tools/CreateNET7Manifest.ps1 >> ${BITBUCKET_CLONE_DIR}/artifacts/CreateNET7Manifest.ps1
 
               ## Build project
-              - dotnet restore
-              - dotnet build -c Release
+              - dotnet restore ./NINA.Plugin.RTSP/
+              - dotnet build -c Release ./NINA.Plugin.RTSP/
               
               ## Copy relevant files to packaging folder
               - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/${PLUGIN_DLL_NAME}.dll ${BITBUCKET_CLONE_DIR}/packages/${PLUGIN_DLL_NAME}.dll
