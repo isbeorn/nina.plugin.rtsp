@@ -21,7 +21,7 @@ pipelines:
             name: dotnet build
             clone:
                 lfs: true
-            image: mcr.microsoft.com/dotnet/sdk:7.0
+            image: mcr.microsoft.com/dotnet/sdk:8.0
             caches:
               - dotnetcore
             script:
@@ -38,15 +38,15 @@ pipelines:
               - dotnet build -c Release ./NINA.Plugin.RTSP/
               
               ## Copy relevant files to packaging folder
-              - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/${PLUGIN_DLL_NAME}.dll ${BITBUCKET_CLONE_DIR}/packages/${PLUGIN_DLL_NAME}.dll
+              - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/${PLUGIN_DLL_NAME}.dll ${BITBUCKET_CLONE_DIR}/packages/${PLUGIN_DLL_NAME}.dll
 
               
-              - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/${PLUGIN_DLL_NAME}.pdb ${BITBUCKET_CLONE_DIR}/packages/${PLUGIN_DLL_NAME}.pdb
-              - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/FFmpeg.AutoGen.dll ${BITBUCKET_CLONE_DIR}/packages/FFmpeg.AutoGen.dll
-              - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/ffme.win.dll ${BITBUCKET_CLONE_DIR}/packages/ffme.win.dll
-              - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/3rd-party-licenses.txt ${BITBUCKET_CLONE_DIR}/packages/3rd-party-licenses.txt
-              - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/LICENSE.txt ${BITBUCKET_CLONE_DIR}/packages/LICENSE.txt
-              - cp NINA.Plugin.RTSP/bin/Release/net7.0-windows/FFMPEG/* ${BITBUCKET_CLONE_DIR}/packages/dll              
+              - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/${PLUGIN_DLL_NAME}.pdb ${BITBUCKET_CLONE_DIR}/packages/${PLUGIN_DLL_NAME}.pdb
+              - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/FFmpeg.AutoGen.dll ${BITBUCKET_CLONE_DIR}/packages/FFmpeg.AutoGen.dll
+              - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/ffme.win.dll ${BITBUCKET_CLONE_DIR}/packages/ffme.win.dll
+              - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/3rd-party-licenses.txt ${BITBUCKET_CLONE_DIR}/packages/3rd-party-licenses.txt
+              - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/LICENSE.txt ${BITBUCKET_CLONE_DIR}/packages/LICENSE.txt
+              - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/FFMPEG/* ${BITBUCKET_CLONE_DIR}/packages/dll              
               
             artifacts:
               - packages/**
