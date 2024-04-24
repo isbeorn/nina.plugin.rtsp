@@ -1,6 +1,7 @@
 ﻿using FFmpeg.AutoGen;
 using NINA.Core.Utility;
 using NINA.Plugin.Interfaces;
+using NINA.Plugin.RTSP.Dockables;
 using System;
 using System.ComponentModel.Composition;
 using System.IO;
@@ -10,6 +11,7 @@ namespace NINA.Plugin.RTSP {
 
     [Export(typeof(IPluginManifest))]
     public class RTSPPlugin : PluginBase {
+        public static RTSPPluginMediator Mediator { get; } = new RTSPPluginMediator();
 
         [ImportingConstructor]
         public RTSPPlugin() {
@@ -20,6 +22,22 @@ namespace NINA.Plugin.RTSP {
             Unosquare.FFME.Library.FFmpegLoadModeFlags = FFmpegLoadMode.FullFeatures;
             Unosquare.FFME.Library.LoadFFmpeg();
             Unosquare.FFME.Library.EnableWpfMultiThreadedVideo = true;
+            Mediator.RegisterPlugin(this);
         }
+    }
+
+    public class RTSPPluginMediator {
+        public RTSPPlugin Plugin { get; private set; }
+        public RTSPVM Player { get; private set; }
+
+        public void RegisterPlugin(RTSPPlugin plugin) {
+            this.Plugin = plugin;
+        }
+
+        public void RegisterRTSPPlayer(RTSPVM player) {
+            this.Player = player;
+        }
+
+        
     }
 }

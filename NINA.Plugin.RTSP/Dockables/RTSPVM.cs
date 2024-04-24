@@ -47,6 +47,8 @@ namespace NINA.Plugin.RTSP.Dockables {
             AddSourceCommand = new RelayCommand(AddSource);
             DeleteSourceCommand = new RelayCommand(DeleteSource);
 
+            RTSPPlugin.Mediator.RegisterRTSPPlayer(this);
+
             ReadSources();
             profileService.ProfileChanged += ProfileService_ProfileChanged;
 

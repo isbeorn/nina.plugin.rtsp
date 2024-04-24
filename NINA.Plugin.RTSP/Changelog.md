@@ -1,4 +1,7 @@
 ﻿# Changelog
+## Version 2.0.0.3
+- Added an instruction in the sequencer to stop the player
+
 ## Version 2.0.0.2
 - Upgrade to .NET 8
 - Auto restart if last decoded frame is longer than 5 seconds ago
