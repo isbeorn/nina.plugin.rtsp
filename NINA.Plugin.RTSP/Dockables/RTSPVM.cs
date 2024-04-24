@@ -9,6 +9,7 @@ using NINA.WPF.Base.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -263,6 +264,7 @@ namespace NINA.Plugin.RTSP.Dockables {
         }
 
         private MediaElement media;
+        private DateTimeOffset lastFrameDecoded = DateTimeOffset.MinValue;
 
         private async Task<bool> StartStream(object o) {
             return await Task.Run(async () => {
@@ -279,15 +281,25 @@ namespace NINA.Plugin.RTSP.Dockables {
                             uri = new Uri($"{Protocol}{System.Web.HttpUtility.UrlEncode(Username)}:{System.Web.HttpUtility.UrlEncode(Password)}@{MediaUrl}");
                         }
 
+                        lastFrameDecoded = DateTimeOffset.MinValue;
                         var successfullyOpened = await media.Open(uri);
 
                         if (successfullyOpened) {
                             try {
                                 OptionsExpanded = false;
+                                media.VideoFrameDecoded += Media_VideoFrameDecoded;
                                 while (media.IsOpen) {
-                                    await Task.Delay(TimeSpan.FromMinutes(1), cts.Token);
+                                    if (lastFrameDecoded > DateTimeOffset.MinValue && DateTimeOffset.UtcNow - lastFrameDecoded > TimeSpan.FromSeconds(5)) {
+                                        Logger.Info("Restarting RTSP Stream as the last decoded frame is longer than 5 seconds ago");
+                                        cts.Cancel();
+                                        _ = RestartStream(media);
+                                    }
+                                    
+                                    await Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
                                 }
                             } catch (OperationCanceledException) {
+                            } finally {
+                                media.VideoFrameDecoded -= Media_VideoFrameDecoded;
                             }
                         }
                         await media.Close();
@@ -302,6 +314,11 @@ namespace NINA.Plugin.RTSP.Dockables {
                 return true;
             });
         }
+
+        private void Media_VideoFrameDecoded(object sender, Unosquare.FFME.Common.FrameDecodedEventArgs e) {
+            lastFrameDecoded = DateTimeOffset.UtcNow;
+        }
+
 
         public IAsyncCommand StartStreamCommand { get; }
         public ICommand StopStreamCommand { get; }

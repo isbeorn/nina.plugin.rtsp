@@ -1,4 +1,13 @@
 ﻿# Changelog
+## Version 2.0.0.2
+- Upgrade to .NET 8
+- Auto restart if last decoded frame is longer than 5 seconds ago
+
+## Version 2.0.0.1
+- Obfuscate username and password on error for log and popup
+
+## Version 2.0.0.0
+- Upgrade to .NET7
 
 ## Version 1.0.1.0
 - More than one source can now be defined to quickly switch between them
