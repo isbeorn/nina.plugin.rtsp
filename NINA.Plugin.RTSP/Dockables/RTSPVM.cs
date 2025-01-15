@@ -61,7 +61,7 @@ namespace NINA.Plugin.RTSP.Dockables {
             LibVLCSharp.Shared.Core.Initialize();
             _libVLC = new LibVLC();
             _libVLC.Log += _libVLC_Log;
-            _mediaPlayer = new MediaPlayer(_libVLC);
+            _mediaPlayer = new MediaPlayer(_libVLC);            
 
         }
 
@@ -299,7 +299,8 @@ namespace NINA.Plugin.RTSP.Dockables {
             return await Application.Current.Dispatcher.InvokeAsync(() => {
                 if (_mediaPlayer == null) { return false; }
                 var media = new Media(_libVLC, url, FromType.FromLocation);
-                if (!string.IsNullOrEmpty(Username)) {
+                media.AddOption($":network-caching={RTSPPlugin.Mediator.Plugin.CachingMs}");
+                if (!string.IsNullOrEmpty(Username)) {                    
                     media.AddOption($":{Protocol.Substring(0, Protocol.Length - 3)}-user={Username}");
                     media.AddOption($":{Protocol.Substring(0, Protocol.Length - 3)}-pwd={Password}");
                 }

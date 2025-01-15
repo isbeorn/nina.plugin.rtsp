@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## 3.0.0.1
+- Added an option to adjust the network caching time similar to the advanced option in VLC Media Player
+
 ## 3.0.0.0
 - Full rework to replace the ffme player with LibVLCSharp
 

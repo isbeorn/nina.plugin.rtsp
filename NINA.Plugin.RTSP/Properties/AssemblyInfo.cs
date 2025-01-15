@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("RTSP Client")]
 [assembly: AssemblyDescription("A plugin that adds a new dock window to the imaging tab to show RTSP video streams")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Stefan Berg")]
+[assembly: AssemblyCompany("Stefan Berg @isbeorn")]
 [assembly: AssemblyProduct("NINA.Plugins")]
 [assembly: AssemblyCopyright("Copyright ©  2022")]
 [assembly: AssemblyTrademark("")]
@@ -32,8 +32,8 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyFileVersion("3.0.0.0")]
+[assembly: AssemblyVersion("3.0.0.1")]
+[assembly: AssemblyFileVersion("3.0.0.1")]
 
 //The minimum Version of N.I.N.A. that this plugin is compatible with
 [assembly: AssemblyMetadata("MinimumApplicationVersion", "3.0.0.9001")]
