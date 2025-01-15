@@ -1,4 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Accord.Statistics.Visualizations;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Google.Protobuf.WellKnownTypes;
+using LibVLCSharp.Shared;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NINA.Core.MyMessageBox;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
@@ -15,17 +20,18 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Cryptography;
+using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using Unosquare.FFME;
+using System.Windows.Threading;
 
 namespace NINA.Plugin.RTSP.Dockables {
 
     [Export(typeof(IDockableVM))]
-    public class RTSPVM : DockableVM {
+    public partial class RTSPVM : DockableVM {
         private CancellationTokenSource cts;
         private bool optionsExpanded;
 
@@ -36,11 +42,11 @@ namespace NINA.Plugin.RTSP.Dockables {
             dict.Source = new Uri("NINA.Plugin.RTSP;component/Dockables/DataTemplates.xaml", UriKind.RelativeOrAbsolute);
             ImageGeometry = (System.Windows.Media.GeometryGroup)dict["NINA.Plugin.RTSP_CameraSVG"];
             ImageGeometry.Freeze();
-            
+
             var assembly = this.GetType().Assembly;
             var id = assembly.GetCustomAttribute<GuidAttribute>().Value;
             this.pluginSettings = new PluginOptionsAccessor(profileService, Guid.Parse(id));
-            
+
             OptionsExpanded = true;
             StartStreamCommand = new AsyncCommand<bool>(StartStream);
             StopStreamCommand = new GalaSoft.MvvmLight.Command.RelayCommand(StopStream);
@@ -52,6 +58,21 @@ namespace NINA.Plugin.RTSP.Dockables {
             ReadSources();
             profileService.ProfileChanged += ProfileService_ProfileChanged;
 
+            LibVLCSharp.Shared.Core.Initialize();
+            _libVLC = new LibVLC();
+            _libVLC.Log += _libVLC_Log;
+            _mediaPlayer = new MediaPlayer(_libVLC);
+
+        }
+
+        private void _libVLC_Log(object sender, LogEventArgs e) {
+            if (e.Message.ToLower().Contains("authentication failed")) {
+                Notification.ShowError("Failed to open stream - authentication failed");
+            }
+            if (e.Message.ToLower().Contains("connection timeout")) {
+                Notification.ShowError("Failed to open stream - connection timeout");
+            }
+            Logger.Trace(e.FormattedLog);
         }
 
         private void ReadSources() {
@@ -72,14 +93,14 @@ namespace NINA.Plugin.RTSP.Dockables {
         }
 
         private void DeleteSource(object obj) {
-            if(Sources.Count > 0 && SelectedSource != null) {
-                if(MyMessageBox.Show($"Delete source @ {SelectedSource.MediaUrl}?", "Delete source", MessageBoxButton.YesNo, MessageBoxResult.No) == MessageBoxResult.Yes) { 
+            if (Sources.Count > 0 && SelectedSource != null) {
+                if (MyMessageBox.Show($"Delete source @ {SelectedSource.MediaUrl}?", "Delete source", MessageBoxButton.YesNo, MessageBoxResult.No) == MessageBoxResult.Yes) {
                     Sources.Remove(SelectedSource);
                     SaveSources();
                 }
             }
-            
-            if(Sources.Count > 0) {
+
+            if (Sources.Count > 0) {
                 SelectedSource = Sources.First();
             } else {
                 AddSource(null);
@@ -160,6 +181,7 @@ namespace NINA.Plugin.RTSP.Dockables {
             set {
                 pluginSettings.SetValueBoolean(nameof(IsMuted), value);
                 RaisePropertyChanged();
+                _ = MutePlayer(value);
             }
         }
 
@@ -168,8 +190,9 @@ namespace NINA.Plugin.RTSP.Dockables {
             set {
                 pluginSettings.SetValueDouble(nameof(Volume), value);
                 RaisePropertyChanged();
+                _ = SetVolumePlayer(value);
             }
-        }        
+        }
 
         public string Protocol {
             get => SelectedSource?.Protocol ?? "rtsp://";
@@ -221,6 +244,9 @@ namespace NINA.Plugin.RTSP.Dockables {
             }
         }
 
+        [ObservableProperty]
+        private bool isOpening;
+
         private AsyncObservableCollection<RTSPSource> sources;
         public AsyncObservableCollection<RTSPSource> Sources {
             get => sources;
@@ -236,19 +262,19 @@ namespace NINA.Plugin.RTSP.Dockables {
             set {
                 selectedSource = value;
                 RaisePropertyChanged();
-                if(selectedSource != null && media != null && media.IsOpen) {                    
+                if (selectedSource != null && _mediaPlayer != null && _mediaPlayer.IsPlaying) {
                     StopStream();
-                    if((SelectedSource.MediaUrl != "") && (SelectedSource.MediaUrl != "<media url>")) {
-                        _ = RestartStream(media);
-                    }                    
+                    if ((SelectedSource.MediaUrl != "") && (SelectedSource.MediaUrl != "<media url>")) {
+                        _ = RestartStream();
+                    }
                 }
             }
         }
-        private async Task RestartStream(MediaElement media) {
-            while(media.IsOpen) {
+        private async Task RestartStream() {
+            while (await IsPlaying()) {
                 await Task.Delay(100);
             }
-            await StartStreamCommand.ExecuteAsync(media);
+            await StartStreamCommand.ExecuteAsync(_hostWindow);
         }
 
         public void SetPassword(SecureString s) {
@@ -265,62 +291,146 @@ namespace NINA.Plugin.RTSP.Dockables {
             }
         }
 
-        private MediaElement media;
-        private DateTimeOffset lastFrameDecoded = DateTimeOffset.MinValue;
+        private LibVLC _libVLC;
+        private MediaPlayer _mediaPlayer;
+        private VideoHwndHost _hostWindow;
+
+        private async Task<bool> OpenPlayer(string url) {
+            return await Application.Current.Dispatcher.InvokeAsync(() => {
+                if (_mediaPlayer == null) { return false; }
+                var media = new Media(_libVLC, url, FromType.FromLocation);
+                if (!string.IsNullOrEmpty(Username)) {
+                    media.AddOption($":{Protocol.Substring(0, Protocol.Length - 3)}-user={Username}");
+                    media.AddOption($":{Protocol.Substring(0, Protocol.Length - 3)}-pwd={Password}");
+                }
+                return _mediaPlayer.Play(media);
+            });
+        }
+        private async Task MutePlayer(bool value) {
+            await Application.Current.Dispatcher.InvokeAsync(() => {
+                if (_mediaPlayer == null) { return; }
+                _mediaPlayer.Mute = value;
+            });
+        }
+        private async Task SetVolumePlayer(double value) {
+            await Application.Current.Dispatcher.InvokeAsync(() => {
+                if (_mediaPlayer == null) { return; }
+                _mediaPlayer.Volume = (int)(value * 100);
+            });
+        }
+
+        private async Task StopPlayer() {
+            await Application.Current.Dispatcher.InvokeAsync(() => {
+                if (_mediaPlayer == null) { return; }
+                _mediaPlayer.Stop();
+                _hostWindow.Width = 0;
+                _hostWindow.Height = 0;
+            });
+        }
+
+        private async Task<VLCState> GetPlayerState() {
+            return await Application.Current.Dispatcher.InvokeAsync(() => {
+                if (_mediaPlayer == null) { return VLCState.Ended; }
+                return _mediaPlayer.State;
+            });
+        }
+
+        private async Task<bool> IsPlaying() {
+            return await Application.Current.Dispatcher.InvokeAsync(() => {
+                if (_mediaPlayer == null) { return false; }
+                return _mediaPlayer.IsPlaying;
+            });
+        }
 
         private async Task<bool> StartStream(object o) {
             return await Task.Run(async () => {
                 using (cts = new CancellationTokenSource()) {
                     try {
-                        media = o as MediaElement;
-                        Uri uri;
-                        if (string.IsNullOrEmpty(Username)) {
-                            uri = new Uri($"{Protocol}{MediaUrl}");
-                        } else {
+                        IsOpening = true;
+                        var token = cts.Token;
+                        var host = o as VideoHwndHost;
+
+                        if (host != _hostWindow) {
+                            if (_hostWindow != null && _hostWindow.Parent != null) {
+                                (_hostWindow.Parent as FrameworkElement).SizeChanged -= RTSPVM_SizeChanged;
+                            }
+
+                            _hostWindow = host;
+                            (_hostWindow.Parent as FrameworkElement).SizeChanged += RTSPVM_SizeChanged;
+                        }
+
+                        _mediaPlayer.Hwnd = host.Handle;
+
+                        Uri uri = new Uri($"{Protocol}{MediaUrl}");
+                        if (!string.IsNullOrEmpty(Username)) {
                             if (string.IsNullOrWhiteSpace(Password)) {
                                 throw new Exception("Password must not be empty");
                             }
-                            uri = new Uri($"{Protocol}{System.Web.HttpUtility.UrlEncode(Username)}:{System.Web.HttpUtility.UrlEncode(Password)}@{MediaUrl}");
                         }
 
-                        lastFrameDecoded = DateTimeOffset.MinValue;
-                        var successfullyOpened = await media.Open(uri);
+                        await MutePlayer(IsMuted);
+                        await SetVolumePlayer(Volume);
+
+                        var successfullyOpened = await OpenPlayer(uri.ToString());
 
                         if (successfullyOpened) {
+                            while (await GetPlayerState() <= VLCState.Opening) {
+                                await Task.Delay(TimeSpan.FromSeconds(1), token);
+                            }
                             try {
+                                uint videoWidth = 0, videoHeight = 0;
+                                while (videoWidth == 0) {
+                                    if (await GetPlayerState() >= VLCState.Stopped) { throw new OperationCanceledException(); }
+                                    _mediaPlayer.Size(0, ref videoWidth, ref videoHeight);
+                                    token.ThrowIfCancellationRequested();
+                                }
+
+                                RTSPVM_SizeChanged(null, null);
+
+                                IsOpening = false;
                                 OptionsExpanded = false;
-                                media.VideoFrameDecoded += Media_VideoFrameDecoded;
-                                while (media.IsOpen) {
-                                    if (lastFrameDecoded > DateTimeOffset.MinValue && DateTimeOffset.UtcNow - lastFrameDecoded > TimeSpan.FromSeconds(5)) {
-                                        Logger.Info("Restarting RTSP Stream as the last decoded frame is longer than 5 seconds ago");
-                                        cts.Cancel();
-                                        _ = RestartStream(media);
-                                    }
-                                    
-                                    await Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
+                                while (await IsPlaying()) {
+                                    await Task.Delay(TimeSpan.FromSeconds(1), token);
                                 }
                             } catch (OperationCanceledException) {
                             } finally {
-                                media.VideoFrameDecoded -= Media_VideoFrameDecoded;
                             }
                         }
-                        await media.Close();
-                    } catch(OperationCanceledException) {
+                        await StopPlayer();
+                    } catch (OperationCanceledException) {
                     } catch (Exception ex) {
                         Logger.Error(ex);
                         Notification.ShowError(ex.Message);
                     } finally {
                         OptionsExpanded = true;
+                        IsOpening = false;
                     }
                 }
                 return true;
             });
         }
 
-        private void Media_VideoFrameDecoded(object sender, Unosquare.FFME.Common.FrameDecodedEventArgs e) {
-            lastFrameDecoded = DateTimeOffset.UtcNow;
-        }
+        private async void RTSPVM_SizeChanged(object sender, SizeChangedEventArgs e) {
+            await Application.Current.Dispatcher.BeginInvoke(() => {
+                uint videoWidth = 0, videoHeight = 0;
+                if (_mediaPlayer.State >= VLCState.Stopped) { return; }
+                _mediaPlayer.Size(0, ref videoWidth, ref videoHeight);
+                if (videoWidth == 0 || videoHeight == 0) { return; }
 
+                double parentWidth = (_hostWindow.Parent as FrameworkElement).ActualWidth;
+                double parentHeight = (_hostWindow.Parent as FrameworkElement).ActualHeight;
+
+                double widthScale = parentWidth / videoWidth;
+                double heightScale = parentHeight / videoHeight;
+                double scale = Math.Min(widthScale, heightScale);
+
+                double scaledWidth = videoWidth * scale;
+                double scaledHeight = videoHeight * scale;
+
+                _hostWindow.Width = Math.Floor(scaledWidth);
+                _hostWindow.Height = Math.Floor(scaledHeight);
+            });
+        }
 
         public IAsyncCommand StartStreamCommand { get; }
         public ICommand StopStreamCommand { get; }

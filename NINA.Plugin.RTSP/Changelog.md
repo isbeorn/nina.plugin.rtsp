@@ -1,4 +1,8 @@
 ﻿# Changelog
+
+## 3.0.0.0
+- Full rework to replace the ffme player with LibVLCSharp
+
 ## Version 2.0.0.3
 - Added an instruction in the sequencer to stop the player
 

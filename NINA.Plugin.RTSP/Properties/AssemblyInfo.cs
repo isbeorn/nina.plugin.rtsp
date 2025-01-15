@@ -32,11 +32,11 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.0.0.3")]
-[assembly: AssemblyFileVersion("2.0.0.3")]
+[assembly: AssemblyVersion("3.0.0.0")]
+[assembly: AssemblyFileVersion("3.0.0.0")]
 
 //The minimum Version of N.I.N.A. that this plugin is compatible with
-[assembly: AssemblyMetadata("MinimumApplicationVersion", "3.0.0.2017")]
+[assembly: AssemblyMetadata("MinimumApplicationVersion", "3.0.0.9001")]
 
 //Your plugin homepage - omit if not applicaple
 [assembly: AssemblyMetadata("Homepage", "https://www.patreon.com/stefanberg/")]
@@ -63,6 +63,5 @@ With this plugin you can show RTSP video streams using compatible video devices 
 Head to the imaging tab, open the new RTSP Player panel that will be available and provide the details like username password and the url to the stream.  
 If your camera does not require authentication, just leave the username and password fields blank.
   
-The plugin is made possible by utilizing the [FFMPEG](https://www.ffmpeg.org/) solution to stream audio and video.  
-Furthermore the video player integration is done using the great [FFMediaElement](https://github.com/unosquare/ffmediaelement) project.  
+The plugin is made possible by utilizing the [libvlc](https://code.videolan.org/videolan/libvlc-nuget) solution.
 ")]

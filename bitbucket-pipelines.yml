@@ -35,7 +35,8 @@ pipelines:
               ## Create artifact folders
               - mkdir -p ${BITBUCKET_CLONE_DIR}/artifacts
               - mkdir -p ${BITBUCKET_CLONE_DIR}/packages  
-              - mkdir -p ${BITBUCKET_CLONE_DIR}/packages/dll
+              - mkdir -p ${BITBUCKET_CLONE_DIR}/packages/libvlc
+              - mkdir -p ${BITBUCKET_CLONE_DIR}/packages/libvlc/win-x64
               
                 ## Get latest manifest creation script
               - curl https://api.bitbucket.org/2.0/repositories/isbeorn/nina.plugin.manifests/src/main/tools/CreateNET7Manifest.ps1 >> ${BITBUCKET_CLONE_DIR}/artifacts/CreateNET7Manifest.ps1
@@ -46,14 +47,12 @@ pipelines:
               
               ## Copy relevant files to packaging folder
               - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/${PLUGIN_DLL_NAME}.dll ${BITBUCKET_CLONE_DIR}/packages/${PLUGIN_DLL_NAME}.dll
-
               
               - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/${PLUGIN_DLL_NAME}.pdb ${BITBUCKET_CLONE_DIR}/packages/${PLUGIN_DLL_NAME}.pdb
-              - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/FFmpeg.AutoGen.dll ${BITBUCKET_CLONE_DIR}/packages/FFmpeg.AutoGen.dll
-              - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/ffme.win.dll ${BITBUCKET_CLONE_DIR}/packages/ffme.win.dll
+              - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/LibVLCSharp.dll ${BITBUCKET_CLONE_DIR}/packages/LibVLCSharp.dll
               - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/3rd-party-licenses.txt ${BITBUCKET_CLONE_DIR}/packages/3rd-party-licenses.txt
               - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/LICENSE.txt ${BITBUCKET_CLONE_DIR}/packages/LICENSE.txt
-              - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/FFMPEG/* ${BITBUCKET_CLONE_DIR}/packages/dll              
+              - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/libvlc/win-x64/* ${BITBUCKET_CLONE_DIR}/packages/libvlc/win-x64           
               
             artifacts:
               - packages/**

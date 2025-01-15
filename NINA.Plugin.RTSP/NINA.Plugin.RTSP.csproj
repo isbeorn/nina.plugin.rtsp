@@ -24,42 +24,13 @@
     <Content Include="3rd-party-licenses.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="FFMPEG\avcodec-58.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="FFMPEG\avdevice-58.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="FFMPEG\avfilter-7.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="FFMPEG\avformat-58.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="FFMPEG\avutil-56.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="FFMPEG\ffmpeg.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="FFMPEG\ffplay.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="FFMPEG\ffprobe.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="FFMPEG\swresample-3.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="FFMPEG\swscale-5.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FFME.Windows" Version="4.4.350" />
+    <PackageReference Include="LibVLCSharp" Version="3.9.1" />
     <PackageReference Include="NINA.Plugin" Version="3.0.0.2017-beta" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec IgnoreExitCode="true" Command="if $(ConfigurationName) == Debug (&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;if not exist &quot;%25localappdata%25\NINA\Plugins&quot; (&#xD;&#xA;    echo &quot;Creating Plugins %25localappdata%25\NINA\Plugins folder&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins&quot;&#xD;&#xA;)&#xD;&#xA;if not exist &quot;%25localappdata%25\NINA\Plugins\3.0.0&quot; (&#xD;&#xA;    echo &quot;Creating Plugins %25localappdata%25\NINA\Plugins\3.0.0 folder&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins\3.0.0&quot;&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;if exist &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client&quot; (&#xD;&#xA;    echo &quot; folder cleanup&quot;&#xD;&#xA;    rmdir &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client&quot; /S /Q&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;if not exist &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client&quot; (&#xD;&#xA;    echo &quot;Creating %25localappdata%25\NINA\Plugin\RTSP Client folder&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client&quot;&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;if not exist &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\dll&quot; (&#xD;&#xA;    echo &quot;Creating %25localappdata%25\NINA\Plugin\RTSP Client\dll folder&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\dll&quot;&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;echo &quot;Copying $(PlatformName) $(TargetFileName)&quot;&#xD;&#xA;copy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\$(TargetName).@(VersionNumber)$(TargetExt)&quot; /Y&#xD;&#xA;copy &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\$(TargetName).@(VersionNumber).pdb &quot; /Y&#xD;&#xA;&#xD;&#xA;copy &quot;$(TargetDir)FFmpeg.AutoGen.dll&quot; &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\FFmpeg.AutoGen.dll&quot; /Y&#xD;&#xA;copy &quot;$(TargetDir)ffme.win.dll&quot; &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\ffme.win.dll&quot; /Y&#xD;&#xA;&#xD;&#xA;xcopy /s /Y &quot;$(TargetDir)FFMPEG&quot; &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\dll&quot;&#xD;&#xA;&#xD;&#xA;copy &quot;$(TargetDir)3rd-party-licenses.txt&quot; &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\3rd-party-licenses.txt&quot; /Y&#xD;&#xA;copy &quot;$(TargetDir)LICENSE.txt&quot; &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\LICENSE.txt&quot; /Y&#xD;&#xA;&#xD;&#xA;)" />
+    <Exec IgnoreExitCode="true" Command="if $(ConfigurationName) == Debug (&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;if not exist &quot;%25localappdata%25\NINA\Plugins&quot; (&#xD;&#xA;    echo &quot;Creating Plugins %25localappdata%25\NINA\Plugins folder&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins&quot;&#xD;&#xA;)&#xD;&#xA;if not exist &quot;%25localappdata%25\NINA\Plugins\3.0.0&quot; (&#xD;&#xA;    echo &quot;Creating Plugins %25localappdata%25\NINA\Plugins\3.0.0 folder&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins\3.0.0&quot;&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;if exist &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client&quot; (&#xD;&#xA;    echo &quot; folder cleanup&quot;&#xD;&#xA;    rmdir &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client&quot; /S /Q&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;if not exist &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client&quot; (&#xD;&#xA;    echo &quot;Creating %25localappdata%25\NINA\Plugin\RTSP Client folder&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client&quot;&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;if not exist &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\libvlc&quot; (&#xD;&#xA;    echo &quot;Creating %25localappdata%25\NINA\Plugin\RTSP Client\libvlc folder&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\libvlc&quot;&#xD;&#xA;    mkdir  &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\libvlc\win-x64&quot;&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;echo &quot;Copying $(PlatformName) $(TargetFileName)&quot;&#xD;&#xA;copy &quot;$(TargetDir)$(TargetFileName)&quot; &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\$(TargetName).@(VersionNumber)$(TargetExt)&quot; /Y&#xD;&#xA;copy &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\$(TargetName).@(VersionNumber).pdb &quot; /Y&#xD;&#xA;&#xD;&#xA;copy &quot;$(TargetDir)LibVLCSharp.dll&quot; &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\LibVLCSharp.dll&quot; /Y&#xD;&#xA; &#xD;&#xA; &#xD;&#xA;xcopy /s /Y &quot;$(TargetDir)libvlc\win-x64&quot; &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\libvlc\win-x64&quot;&#xD;&#xA;&#xD;&#xA;copy &quot;$(TargetDir)3rd-party-licenses.txt&quot; &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\3rd-party-licenses.txt&quot; /Y&#xD;&#xA;copy &quot;$(TargetDir)LICENSE.txt&quot; &quot;%25localappdata%25\NINA\Plugins\3.0.0\RTSP Client\LICENSE.txt&quot; /Y&#xD;&#xA;&#xD;&#xA;)" />
   </Target>
 </Project>
