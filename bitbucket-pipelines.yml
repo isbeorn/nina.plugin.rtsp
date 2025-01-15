@@ -52,7 +52,7 @@ pipelines:
               - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/LibVLCSharp.dll ${BITBUCKET_CLONE_DIR}/packages/LibVLCSharp.dll
               - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/3rd-party-licenses.txt ${BITBUCKET_CLONE_DIR}/packages/3rd-party-licenses.txt
               - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/LICENSE.txt ${BITBUCKET_CLONE_DIR}/packages/LICENSE.txt
-              - cp NINA.Plugin.RTSP/bin/Release/net8.0-windows/libvlc/win-x64/* ${BITBUCKET_CLONE_DIR}/packages/libvlc/win-x64           
+              - cp -r NINA.Plugin.RTSP/bin/Release/net8.0-windows/libvlc/win-x64/* ${BITBUCKET_CLONE_DIR}/packages/libvlc/win-x64           
               
             artifacts:
               - packages/**
