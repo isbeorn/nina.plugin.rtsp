@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## 3.1.0.0
+- Reworked the layout to be able to manage and start multiple streams at the same time
+
 ## 3.0.0.1
 - Added an option to adjust the network caching time similar to the advanced option in VLC Media Player
 

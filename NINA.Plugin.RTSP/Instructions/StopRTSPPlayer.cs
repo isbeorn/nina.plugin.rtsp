@@ -29,7 +29,7 @@ namespace NINA.Plugin.RTSP.Instructions {
         }
 
         public override async Task Execute(IProgress<ApplicationStatus> progress, CancellationToken token) {
-            RTSPPlugin.Mediator.Player.StopStreamCommand.Execute(null);
+            RTSPPlugin.Mediator.Player.StopAllStreamsCommand.Execute(null);
         }
     }
 }

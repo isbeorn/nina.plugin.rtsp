@@ -1,5 +1,6 @@
 ﻿using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
@@ -18,17 +19,24 @@ namespace NINA.Plugin.RTSP.Dockables {
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e) {
             if (sender is PasswordBox elem) {
-                if (elem.DataContext is RTSPVM vm) {
-                    vm.SetPassword(elem.SecurePassword);
+                if (elem.DataContext is RTSPSource source) {
+                    source.SetPassword(elem.SecurePassword);
                 }
             }
         }
 
         private void PasswordBox_Loaded(object sender, RoutedEventArgs e) {            
             if (sender is PasswordBox elem) {
-                if (elem.DataContext is RTSPVM vm) {
-                    elem.Password = vm.Password;
+                if (elem.DataContext is RTSPSource source) {
+                    elem.Password = Decrypt(source.Password);
                 }
+            }
+        }
+        private string Decrypt(string encrypt) {
+            try {
+                return DataProtection.Unprotect(Convert.FromBase64String(encrypt));
+            } catch (Exception) {
+                return "";
             }
         }
     }

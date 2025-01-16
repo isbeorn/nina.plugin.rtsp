@@ -1,8 +1,8 @@
-﻿using System;
+﻿using LibVLCSharp.Shared;
+using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
-using System.Windows.Media;
 
 namespace NINA.Plugin.RTSP.Dockables {
     //internal class VideoHwndHost : HwndHost {
@@ -38,6 +38,12 @@ namespace NINA.Plugin.RTSP.Dockables {
         private const int WS_EX_LAYERED = 0x00080000;
 
         public IntPtr Hwnd => _hwnd;
+
+        public MediaPlayer Player { get; }
+
+        public VideoHwndHost(MediaPlayer player) {
+            Player = player;
+        }
 
         protected override HandleRef BuildWindowCore(HandleRef hwndParent) {
             _parentHwnd = hwndParent.Handle;
