@@ -520,7 +520,12 @@ namespace NINA.Plugin.RTSP.Dockables {
         public void SetPassword(SecureString s) {
             var pw = SecureStringToString(s);
             var encrypt = DataProtection.Protect(pw);
-            Password = Convert.ToBase64String(encrypt);
+            if(encrypt == null) {
+                Password = "";
+            } else {
+                Password = Convert.ToBase64String(encrypt);
+            }
+            
         }
         private string SecureStringToString(SecureString value) {
             IntPtr valuePtr = IntPtr.Zero;
