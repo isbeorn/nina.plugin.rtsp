@@ -163,9 +163,37 @@
                         <DataGrid
                             AutoGenerateColumns="False"
                             CanUserAddRows="False"
+                            DataGridCell.GotFocus="DataGrid_CellGotFocus"
                             HorizontalScrollBarVisibility="Auto"
                             ItemsSource="{Binding Sources}">
-
+                            <DataGrid.CellStyle>
+                                <Style BasedOn="{StaticResource CenteredDataGridCell}" TargetType="DataGridCell">
+                                    <Style.Triggers>
+                                        <Trigger Property="DataGridCell.IsSelected" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource BackgroundBrush}" />
+                                            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource SecondaryBackgroundBrush}" />
+                                            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.CellStyle>
+                            <DataGrid.RowStyle>
+                                <Style BasedOn="{StaticResource StandardDataGridRow}" TargetType="DataGridRow">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource BackgroundBrush}" />
+                                            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="{StaticResource BackgroundBrush}" />
+                                            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.RowStyle>
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn
                                     Width="40"
@@ -240,12 +268,11 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                     <DataGridTemplateColumn.CellEditingTemplate>
                                         <DataTemplate>
-                                            <ninactrl:HintTextBox
+                                            <TextBox
                                                 MinWidth="80"
                                                 Margin="5,0,0,0"
                                                 VerticalAlignment="Center"
                                                 VerticalContentAlignment="Center"
-                                                HintText="Username"
                                                 Text="{Binding Username}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellEditingTemplate>
@@ -298,7 +325,7 @@
                                         <DataTemplate>
                                             <TextBlock
                                                 MinWidth="120"
-                                                Margin="5,0,0,0"
+                                                Margin="10,0,0,0"
                                                 HorizontalAlignment="Left"
                                                 VerticalAlignment="Center"
                                                 Text="{Binding MediaUrl}" />
@@ -306,14 +333,13 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                     <DataGridTemplateColumn.CellEditingTemplate>
                                         <DataTemplate>
-                                            <ninactrl:HintTextBox
+                                            <TextBox
                                                 MinWidth="120"
                                                 Margin="5,0,0,0"
                                                 HorizontalAlignment="Left"
                                                 VerticalAlignment="Center"
                                                 HorizontalContentAlignment="Left"
                                                 VerticalContentAlignment="Center"
-                                                HintText="Url"
                                                 Text="{Binding MediaUrl}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellEditingTemplate>

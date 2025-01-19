@@ -5,12 +5,41 @@
     xmlns:ninactrl="clr-namespace:NINA.CustomControlLibrary;assembly=NINA.CustomControlLibrary">
 
     <DataTemplate x:Key="RTSP Client_Options">
-        <StackPanel Orientation="Horizontal">
-            <TextBlock VerticalAlignment="Center" Text="Caching" />
-            <ninactrl:UnitTextBox
-                Margin="5,0,0,0"
-                Text="{Binding CachingMs}"
-                Unit="ms" />
+        <StackPanel Grid.IsSharedSizeScope="True" Orientation="Vertical">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="RTSPOptions_Label" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock VerticalAlignment="Center" Text="Caching" />
+                <ninactrl:UnitTextBox
+                    Grid.Column="1"
+                    MinWidth="70"
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Left"
+                    Text="{Binding CachingMs}"
+                    Unit="ms" />
+            </Grid>
+            <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="RTSPOptions_Label" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock VerticalAlignment="Center" Text="Use RTP over RTSP (TCP)">
+                    <TextBlock.ToolTip>
+                        <TextBlock Text="Forces RTP media data to be sent over TCP via RTSP, which can help with restrictive networks or firewalls that block UDP traffic." />
+                    </TextBlock.ToolTip>
+                </TextBlock>
+                <CheckBox
+                    Grid.Column="1"
+                    Margin="5,0,0,0"
+                    HorizontalAlignment="Left"
+                    IsChecked="{Binding UseRtspTcp, Mode=TwoWay}">
+                    <CheckBox.ToolTip>
+                        <TextBlock Text="Forces RTP media data to be sent over TCP via RTSP, which can help with restrictive networks or firewalls that block UDP traffic." />
+                    </CheckBox.ToolTip>
+                </CheckBox>
+            </Grid>
         </StackPanel>
     </DataTemplate>
 </ResourceDictionary>

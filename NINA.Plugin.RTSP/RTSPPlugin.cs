@@ -26,6 +26,16 @@ namespace NINA.Plugin.RTSP {
             PluginSettings = new PluginOptionsAccessor(profileService, Guid.Parse(this.Identifier));
         }
 
+        public bool UseRtspTcp {
+            get {
+                return PluginSettings.GetValueBoolean(nameof(UseRtspTcp), false);
+            } 
+            set {
+                PluginSettings.SetValueBoolean(nameof(UseRtspTcp), value);
+                RaisePropertyChanged();
+            }
+        }
+
         public ushort CachingMs {
             get {
                 return PluginSettings.GetValueUInt16(nameof(CachingMs), 1000);

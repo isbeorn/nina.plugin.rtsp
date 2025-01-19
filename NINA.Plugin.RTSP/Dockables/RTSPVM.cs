@@ -76,7 +76,7 @@ namespace NINA.Plugin.RTSP.Dockables {
         private void ReadSources() {
             Sources = new AsyncObservableCollection<RTSPSource>(FromStringToList<RTSPSource>(pluginSettings.GetValueString(nameof(Sources), "")));
 
-            foreach(var source in Sources) {
+            foreach (var source in Sources) {
                 source.PropertyChanged += Source_PropertyChanged;
                 source.IsLoading = false;
                 source.IsRunning = false;
@@ -111,10 +111,10 @@ namespace NINA.Plugin.RTSP.Dockables {
 
         private void AddSource(object obj) {
             var source = new RTSPSource {
-                Username = "<username>",
+                Username = "",
                 Password = "",
                 Protocol = "rtsp://",
-                MediaUrl = "<media url>"
+                MediaUrl = ""
             };
             Sources.Add(source);
             source.PropertyChanged += Source_PropertyChanged;
@@ -126,7 +126,7 @@ namespace NINA.Plugin.RTSP.Dockables {
                 || e.PropertyName == nameof(RTSPSource.Password)
                 || e.PropertyName == nameof(RTSPSource.MediaUrl)) {
                 SaveSources();
-            }            
+            }
         }
 
         private void SaveSources() {
@@ -165,13 +165,13 @@ namespace NINA.Plugin.RTSP.Dockables {
         }
 
         private void StopAllStreams(object o) {
-            foreach(var stream in activeStreams.ToList()) {
+            foreach (var stream in activeStreams.ToList()) {
                 stream.source.IsRunning = false;
             }
         }
 
         private void StopStream(object o) {
-            if(o is RTSPSource source) {
+            if (o is RTSPSource source) {
                 source.IsRunning = false;
             }
         }
@@ -229,8 +229,11 @@ namespace NINA.Plugin.RTSP.Dockables {
             return await Application.Current.Dispatcher.InvokeAsync(() => {
                 if (player == null) { return false; }
                 var media = new Media(_libVLC, uri.ToString(), FromType.FromLocation);
+                if (RTSPPlugin.Mediator.Plugin.UseRtspTcp) {
+                    media.AddOption(":rtsp-tcp");
+                }
                 media.AddOption($":network-caching={RTSPPlugin.Mediator.Plugin.CachingMs}");
-                if (!string.IsNullOrEmpty(source.Username)) {                    
+                if (!string.IsNullOrEmpty(source.Username)) {
                     media.AddOption($":{source.Protocol.Substring(0, source.Protocol.Length - 3)}-user={source.Username}");
                     media.AddOption($":{source.Protocol.Substring(0, source.Protocol.Length - 3)}-pwd={Decrypt(source.Password)}");
                 }
@@ -240,7 +243,7 @@ namespace NINA.Plugin.RTSP.Dockables {
         private async Task MutePlayer(bool value) {
             await Application.Current.Dispatcher.InvokeAsync(() => {
                 foreach (var child in panel.Children) {
-                    if(child is VideoHwndHost host) {
+                    if (child is VideoHwndHost host) {
                         host.Player.Mute = value;
                     }
                 }
@@ -249,7 +252,7 @@ namespace NINA.Plugin.RTSP.Dockables {
         private async Task SetVolumePlayer(double value) {
             await Application.Current.Dispatcher.InvokeAsync(() => {
                 foreach (var child in panel.Children) {
-                    if(child is VideoHwndHost host) {
+                    if (child is VideoHwndHost host) {
                         host.Player.Volume = (int)(value * 100);
                     }
                 }
@@ -324,8 +327,8 @@ namespace NINA.Plugin.RTSP.Dockables {
 
                         VideoHwndHost host = null;
                         host = await CreateHost(source, panel);
-                        
-                        
+
+
                         var player = host.Player;
                         player.Hwnd = host.Handle;
 
@@ -375,8 +378,7 @@ namespace NINA.Plugin.RTSP.Dockables {
         }
 
         private async void RTSPVM_SizeChanged(object sender, SizeChangedEventArgs e) {
-            await Application.Current.Dispatcher.InvokeAsync(() =>
-            {
+            await Application.Current.Dispatcher.InvokeAsync(() => {
                 if (!(sender is Grid panel)) return;
 
                 double parentWidth = panel.ActualWidth;
@@ -520,12 +522,12 @@ namespace NINA.Plugin.RTSP.Dockables {
         public void SetPassword(SecureString s) {
             var pw = SecureStringToString(s);
             var encrypt = DataProtection.Protect(pw);
-            if(encrypt == null) {
+            if (encrypt == null) {
                 Password = "";
             } else {
                 Password = Convert.ToBase64String(encrypt);
             }
-            
+
         }
         private string SecureStringToString(SecureString value) {
             IntPtr valuePtr = IntPtr.Zero;
