@@ -242,6 +242,7 @@ namespace NINA.Plugin.RTSP.Dockables {
         }
         private async Task MutePlayer(bool value) {
             await Application.Current.Dispatcher.InvokeAsync(() => {
+                if (panel is null) { return; }
                 foreach (var child in panel.Children) {
                     if (child is VideoHwndHost host) {
                         host.Player.Mute = value;
@@ -251,6 +252,7 @@ namespace NINA.Plugin.RTSP.Dockables {
         }
         private async Task SetVolumePlayer(double value) {
             await Application.Current.Dispatcher.InvokeAsync(() => {
+                if (panel is null) { return; }
                 foreach (var child in panel.Children) {
                     if (child is VideoHwndHost host) {
                         host.Player.Volume = (int)(value * 100);
@@ -380,76 +382,79 @@ namespace NINA.Plugin.RTSP.Dockables {
         private async void RTSPVM_SizeChanged(object sender, SizeChangedEventArgs e) {
             await Application.Current.Dispatcher.InvokeAsync(() => {
                 if (!(sender is Grid panel)) return;
+                try {
+                    double parentWidth = panel.ActualWidth;
+                    double parentHeight = panel.ActualHeight;
 
-                double parentWidth = panel.ActualWidth;
-                double parentHeight = panel.ActualHeight;
+                    // Collect valid VideoHwndHosts with their video dimensions
+                    var videoHosts = panel.Children.OfType<VideoHwndHost>()
+                        .Select(host => {
+                            uint vWidth = 0, vHeight = 0;
+                            host.Player.Size(0, ref vWidth, ref vHeight);
+                            return new { Host = host, Width = (double)vWidth, Height = (double)vHeight };
+                        })
+                        .Where(x => x.Width > 0 && x.Height > 0)
+                        .ToList();
 
-                // Collect valid VideoHwndHosts with their video dimensions
-                var videoHosts = panel.Children.OfType<VideoHwndHost>()
-                    .Select(host => {
-                        uint vWidth = 0, vHeight = 0;
-                        host.Player.Size(0, ref vWidth, ref vHeight);
-                        return new { Host = host, Width = (double)vWidth, Height = (double)vHeight };
-                    })
-                    .Where(x => x.Width > 0 && x.Height > 0)
-                    .ToList();
+                    int totalPlayers = videoHosts.Count;
+                    if (totalPlayers == 0) return;
 
-                int totalPlayers = videoHosts.Count;
-                if (totalPlayers == 0) return;
+                    // Determine the optimal grid configuration
+                    int bestCols = 1, bestRows = totalPlayers;
+                    double bestScale = 0;
+                    double optimalCellWidth = parentWidth, optimalCellHeight = parentHeight;
 
-                // Determine the optimal grid configuration
-                int bestCols = 1, bestRows = totalPlayers;
-                double bestScale = 0;
-                double optimalCellWidth = parentWidth, optimalCellHeight = parentHeight;
+                    for (int cols = 1; cols <= totalPlayers; cols++) {
+                        int rows = (int)Math.Ceiling((double)totalPlayers / cols);
+                        double cellWidth = parentWidth / cols;
+                        double cellHeight = parentHeight / rows;
 
-                for (int cols = 1; cols <= totalPlayers; cols++) {
-                    int rows = (int)Math.Ceiling((double)totalPlayers / cols);
-                    double cellWidth = parentWidth / cols;
-                    double cellHeight = parentHeight / rows;
+                        double minScaleForConfig = double.MaxValue;
+                        foreach (var vh in videoHosts) {
+                            double widthScale = cellWidth / vh.Width;
+                            double heightScale = cellHeight / vh.Height;
+                            double scale = Math.Min(widthScale, heightScale);
+                            if (scale < minScaleForConfig) minScaleForConfig = scale;
+                        }
 
-                    double minScaleForConfig = double.MaxValue;
+                        if (minScaleForConfig > bestScale) {
+                            bestScale = minScaleForConfig;
+                            bestCols = cols;
+                            bestRows = rows;
+                            optimalCellWidth = cellWidth;
+                            optimalCellHeight = cellHeight;
+                        }
+                    }
+
+                    // Layout each video host in the grid
+                    int currentCol = 0, currentRow = 0;
                     foreach (var vh in videoHosts) {
-                        double widthScale = cellWidth / vh.Width;
-                        double heightScale = cellHeight / vh.Height;
+                        double widthScale = optimalCellWidth / vh.Width;
+                        double heightScale = optimalCellHeight / vh.Height;
                         double scale = Math.Min(widthScale, heightScale);
-                        if (scale < minScaleForConfig) minScaleForConfig = scale;
+
+                        double scaledWidth = vh.Width * scale;
+                        double scaledHeight = vh.Height * scale;
+
+                        double offsetX = (optimalCellWidth - scaledWidth) / 2;
+                        double offsetY = (optimalCellHeight - scaledHeight) / 2;
+
+                        vh.Host.Width = Math.Floor(scaledWidth);
+                        vh.Host.Height = Math.Floor(scaledHeight);
+                        vh.Host.Margin = new Thickness(
+                            currentCol * optimalCellWidth + offsetX,
+                            currentRow * optimalCellHeight + offsetY,
+                            0,
+                            0);
+
+                        currentCol++;
+                        if (currentCol >= bestCols) {
+                            currentCol = 0;
+                            currentRow++;
+                        }
                     }
-
-                    if (minScaleForConfig > bestScale) {
-                        bestScale = minScaleForConfig;
-                        bestCols = cols;
-                        bestRows = rows;
-                        optimalCellWidth = cellWidth;
-                        optimalCellHeight = cellHeight;
-                    }
-                }
-
-                // Layout each video host in the grid
-                int currentCol = 0, currentRow = 0;
-                foreach (var vh in videoHosts) {
-                    double widthScale = optimalCellWidth / vh.Width;
-                    double heightScale = optimalCellHeight / vh.Height;
-                    double scale = Math.Min(widthScale, heightScale);
-
-                    double scaledWidth = vh.Width * scale;
-                    double scaledHeight = vh.Height * scale;
-
-                    double offsetX = (optimalCellWidth - scaledWidth) / 2;
-                    double offsetY = (optimalCellHeight - scaledHeight) / 2;
-
-                    vh.Host.Width = Math.Floor(scaledWidth);
-                    vh.Host.Height = Math.Floor(scaledHeight);
-                    vh.Host.Margin = new Thickness(
-                        currentCol * optimalCellWidth + offsetX,
-                        currentRow * optimalCellHeight + offsetY,
-                        0,
-                        0);
-
-                    currentCol++;
-                    if (currentCol >= bestCols) {
-                        currentCol = 0;
-                        currentRow++;
-                    }
+                } catch (Exception ex) {
+                    Logger.Error(ex);
                 }
             });
         }

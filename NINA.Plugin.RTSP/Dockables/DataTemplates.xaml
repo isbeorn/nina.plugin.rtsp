@@ -98,11 +98,6 @@
         <!--  ThePanel is required for proper sizing of the grid, as it's not scaling correctly for whatever reason when not sufficient space available  -->
         <DockPanel x:Name="ThePanel">
             <Grid x:Name="TheGrid" Margin="5">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Loaded">
-                        <i:InvokeCommandAction Command="{Binding SetTheGridCommand}" CommandParameter="{Binding ElementName=VideoPanel}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
                 <Grid.RowDefinitions>
                     <RowDefinition />
                     <RowDefinition Height="5" />
@@ -123,6 +118,11 @@
                     x:Name="VideoPanel"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Loaded">
+                            <i:InvokeCommandAction Command="{Binding SetTheGridCommand}" CommandParameter="{Binding ElementName=VideoPanel}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                     <!--  Media players get dynamically spawned into this grid  -->
                 </Grid>
                 <Border

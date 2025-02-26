@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## 3.1.0.4
+- When RTSP panel initially loads as a floating panel it will no longer fail to start the stream
+
 ## 3.1.0.3
 - Reworked the layout to be able to manage and start multiple streams at the same time
 - Added flag to force RTP media data to be sent over TCP via RTSP, which can help with restrictive networks or firewalls that block UDP traffic.
