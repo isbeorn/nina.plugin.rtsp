@@ -31,6 +31,7 @@ jobs:
         run: |
           mkdir packages
           mkdir "packages/${{ env.PLUGIN_NAME }}"
+          mkdir "packages/${{ env.PLUGIN_NAME }}/libvlc"
 
       # This will build your solution. If the solution name differs from your plugin name, please adjust it here
       - name: Build .NET Assemblies
@@ -56,7 +57,7 @@ jobs:
           Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/LibVLCSharp.dll" "packages/${{ env.PLUGIN_NAME }}/LibVLCSharp.dll" -Force
           Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/3rd-party-licenses.txt" "packages/${{ env.PLUGIN_NAME }}/3rd-party-licenses.txt" -Force
           Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/LICENSE.txt" "packages/${{ env.PLUGIN_NAME }}/LICENSE.txt" -Force
-          Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/libvlc/win-x64/*" "/packages/${{ env.PLUGIN_NAME }}/libvlc/win-x64" -Recurse
+          Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/libvlc/win-x64/*" "packages/${{ env.PLUGIN_NAME }}/libvlc/win-x64" -Recurse -Force
           
       - name: Create Plugin archives and manifests
         run: |
