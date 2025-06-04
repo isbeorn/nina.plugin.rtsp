@@ -57,6 +57,8 @@ jobs:
           Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/LibVLCSharp.dll" "packages/${{ env.PLUGIN_NAME }}/LibVLCSharp.dll" -Force
           Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/3rd-party-licenses.txt" "packages/${{ env.PLUGIN_NAME }}/3rd-party-licenses.txt" -Force
           Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/LICENSE.txt" "packages/${{ env.PLUGIN_NAME }}/LICENSE.txt" -Force
+
+          New-Item -ItemType Directory -Force -Path "packages/${{ env.PLUGIN_NAME }}/libvlc/win-x64" | Out-Null
           Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/libvlc/win-x64/*" "packages/${{ env.PLUGIN_NAME }}/libvlc/win-x64" -Recurse -Force
           
       - name: Create Plugin archives and manifests
