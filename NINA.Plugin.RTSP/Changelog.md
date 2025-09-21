@@ -1,6 +1,6 @@
 ﻿# Changelog
 
-## 3.1.0.5
+## 3.1.0.6
 - When changing values in the list of stream sources, the changes will be reflected immediately instead of when the panel loses focus
 
 ## 3.1.0.4
