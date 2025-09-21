@@ -7,8 +7,8 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <AssemblyTitle>RTSP Plugin</AssemblyTitle>
-    <Title>RTSP Plugin</Title>
+    <AssemblyTitle>RTSP Client</AssemblyTitle>
+    <Title>RTSP Client</Title>
     <Authors>Stefan Berg @isbeorn</Authors>
     <Product>NINA.Plugins</Product>
     <Description>A plugin that adds a new dock window to the imaging tab to show RTSP video streams</Description>
