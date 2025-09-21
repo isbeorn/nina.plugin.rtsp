@@ -52,15 +52,15 @@ jobs:
       # Add all necessary files that the plugin needs to the packages folder - basically all items that are normally in your post build event on your local builds
       - name: Prepare package
         run: |
-          Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/${{ env.PLUGIN_DLL_NAME }}.dll" "packages/${{ env.PLUGIN_NAME }}/${{ env.PLUGIN_DLL_NAME }}.dll" -Force
-          Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/${{ env.PLUGIN_DLL_NAME }}.pdb" "packages/${{ env.PLUGIN_NAME }}/${{ env.PLUGIN_DLL_NAME }}.pdb" -Force
+          Copy-Item "bin/Release/net8.0-windows/${{ env.PLUGIN_DLL_NAME }}.dll" "packages/${{ env.PLUGIN_NAME }}/${{ env.PLUGIN_DLL_NAME }}.dll" -Force
+          Copy-Item "bin/Release/net8.0-windows/${{ env.PLUGIN_DLL_NAME }}.pdb" "packages/${{ env.PLUGIN_NAME }}/${{ env.PLUGIN_DLL_NAME }}.pdb" -Force
           
-          Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/LibVLCSharp.dll" "packages/${{ env.PLUGIN_NAME }}/LibVLCSharp.dll" -Force
-          Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/3rd-party-licenses.txt" "packages/${{ env.PLUGIN_NAME }}/3rd-party-licenses.txt" -Force
-          Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/LICENSE.txt" "packages/${{ env.PLUGIN_NAME }}/LICENSE.txt" -Force
+          Copy-Item "bin/Release/net8.0-windows/LibVLCSharp.dll" "packages/${{ env.PLUGIN_NAME }}/LibVLCSharp.dll" -Force
+          Copy-Item "bin/Release/net8.0-windows/3rd-party-licenses.txt" "packages/${{ env.PLUGIN_NAME }}/3rd-party-licenses.txt" -Force
+          Copy-Item "bin/Release/net8.0-windows/LICENSE.txt" "packages/${{ env.PLUGIN_NAME }}/LICENSE.txt" -Force
 
           New-Item -ItemType Directory -Force -Path "packages/${{ env.PLUGIN_NAME }}/libvlc/win-x64" | Out-Null
-          Copy-Item "NINA.Plugin.RTSP/bin/Release/net8.0-windows/libvlc/win-x64/*" "packages/${{ env.PLUGIN_NAME }}/libvlc/win-x64" -Recurse -Force
+          Copy-Item "bin/Release/net8.0-windows/libvlc/win-x64/*" "packages/${{ env.PLUGIN_NAME }}/libvlc/win-x64" -Recurse -Force
           
       - name: Create Plugin archives and manifests
         run: |
