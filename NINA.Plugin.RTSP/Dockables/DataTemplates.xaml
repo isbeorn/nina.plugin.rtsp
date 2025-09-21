@@ -263,7 +263,7 @@
                                                 MinWidth="80"
                                                 Margin="5,0,0,0"
                                                 VerticalAlignment="Center"
-                                                Text="{Binding Username}" />
+                                                Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                     <DataGridTemplateColumn.CellEditingTemplate>
@@ -273,7 +273,7 @@
                                                 Margin="5,0,0,0"
                                                 VerticalAlignment="Center"
                                                 VerticalContentAlignment="Center"
-                                                Text="{Binding Username}" />
+                                                Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellEditingTemplate>
                                 </DataGridTemplateColumn>
@@ -311,12 +311,12 @@
                                 <DataGridTemplateColumn Header="Protocol">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock VerticalAlignment="Center" Text="{Binding Protocol}" />
+                                            <TextBlock VerticalAlignment="Center" Text="{Binding Protocol, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                     <DataGridTemplateColumn.CellEditingTemplate>
                                         <DataTemplate>
-                                            <ComboBox ItemsSource="{Binding DataContext.Protocols, ElementName=TheGrid}" SelectedItem="{Binding Protocol}" />
+                                            <ComboBox ItemsSource="{Binding DataContext.Protocols, ElementName=TheGrid}" SelectedItem="{Binding Protocol, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellEditingTemplate>
                                 </DataGridTemplateColumn>
@@ -328,7 +328,7 @@
                                                 Margin="10,0,0,0"
                                                 HorizontalAlignment="Left"
                                                 VerticalAlignment="Center"
-                                                Text="{Binding MediaUrl}" />
+                                                Text="{Binding MediaUrl, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                     <DataGridTemplateColumn.CellEditingTemplate>
@@ -340,7 +340,7 @@
                                                 VerticalAlignment="Center"
                                                 HorizontalContentAlignment="Left"
                                                 VerticalContentAlignment="Center"
-                                                Text="{Binding MediaUrl}" />
+                                                Text="{Binding MediaUrl, UpdateSourceTrigger=PropertyChanged}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellEditingTemplate>
                                 </DataGridTemplateColumn>

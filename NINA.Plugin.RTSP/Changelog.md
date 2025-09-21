@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## 3.1.0.5
+- When changing values in the list of stream sources, the changes will be reflected immediately instead of when the panel loses focus
+
 ## 3.1.0.4
 - When RTSP panel initially loads as a floating panel it will no longer fail to start the stream
 

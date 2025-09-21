@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RTSP Client")]
-[assembly: AssemblyDescription("A plugin that adds a new dock window to the imaging tab to show RTSP video streams")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Stefan Berg @isbeorn")]
-[assembly: AssemblyProduct("NINA.Plugins")]
-[assembly: AssemblyCopyright("Copyright ©  2022-2025")]
+//[assembly: AssemblyTitle("RTSP Client")]
+//[assembly: AssemblyDescription("A plugin that adds a new dock window to the imaging tab to show RTSP video streams")]
+//[assembly: AssemblyConfiguration("")]
+//[assembly: AssemblyCompany("Stefan Berg @isbeorn")]
+//[assembly: AssemblyProduct("NINA.Plugins")]
+//[assembly: AssemblyCopyright("Copyright ©  2022-2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,8 +32,8 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("3.1.0.5")]
-[assembly: AssemblyFileVersion("3.1.0.5")]
+//[assembly: AssemblyVersion("3.1.0.5")]
+//[assembly: AssemblyFileVersion("3.1.0.5")]
 
 //The minimum Version of N.I.N.A. that this plugin is compatible with
 [assembly: AssemblyMetadata("MinimumApplicationVersion", "3.0.0.9001")]

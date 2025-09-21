@@ -2,11 +2,17 @@
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>Library</OutputType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <AssemblyTitle>RTSP Plugin</AssemblyTitle>
+    <Title>RTSP Plugin</Title>
+    <Authors>Stefan Berg @isbeorn</Authors>
+    <Product>NINA.Plugins</Product>
+    <Description>A plugin that adds a new dock window to the imaging tab to show RTSP video streams</Description>
+    <Copyright>Copyright ©  2021-2025</Copyright>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <OutputPath>bin\x64\Debug\</OutputPath>
